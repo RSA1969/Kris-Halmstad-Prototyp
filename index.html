@@ -10,72 +10,86 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="icon" href="icons/icon-192.png">
 
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
+    /* Baslayout */
     body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto; background:#0b1116; color:#e7eef6; }
     header { padding:16px; background:#0d1520; border-bottom:1px solid #223042; }
     h1 { margin:0; font-size:20px; }
 
-    nav { display:flex; gap:8px; background:#0d1520; padding:8px; position:sticky; top:52px; }
+    /* Header: logga + rubrik */
+    .brand { display:flex; align-items:center; gap:12px; }
+    .brand img { height:28px; width:auto; display:block; }
+    @media (min-width: 768px){ .brand img { height:32px; } }
+
+    /* Flikar */
+    nav { display:flex; gap:8px; background:#0d1520; padding:8px; position:sticky; top:52px; z-index:5; }
     nav button {
       padding:8px 12px; border-radius:10px; background:#121a22;
       color:#e7eef6; border:1px solid #223042; cursor:pointer;
     }
     nav button.active { background:#101c29; border-color:#0072ce; }
 
+    /* Paneler & kort */
     .panel { display:none; padding:16px; }
     .panel.active { display:block; }
-
     .card {
-      padding:12px;
-      border-radius:12px;
-      background:#121a22;
-      border:1px solid #223042;
-      margin-bottom:12px;
+      padding:12px; border-radius:12px; background:#121a22;
+      border:1px solid #223042; margin-bottom:12px;
     }
 
-    #map {
-      height:360px;
-      border-radius:12px;
-      border:1px solid #223042;
-    }
+    /* Karta */
+    #map { height:360px; border-radius:12px; border:1px solid #223042; }
 
+    /* Knappar */
     .btn, .btn-outline {
-      padding:8px 12px; border-radius:10px;
-      font-weight:600; cursor:pointer;
-      border:1px solid #0072ce;
+      padding:8px 12px; border-radius:10px; font-weight:600; cursor:pointer; border:1px solid #0072ce;
     }
-    .btn { background:#0072ce; color:white; }
+    .btn { background:#0072ce; color:#fff; }
     .btn-outline { background:transparent; color:#0072ce; }
 
     /* --- Krislägen (inbäddad vy) --- */
     .panel-embed {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      padding: 16px;
-      min-height: calc(100vh - 120px); /* justera vid behov */
+      display:flex; flex-direction:column; gap:12px; padding:16px;
+      min-height:calc(100vh - 120px);
     }
     .embed-frame {
-      flex: 1 1 auto;
-      width: 100%;
-      height: 70vh;            /* reservhöjd */
-      min-height: 600px;       /* så att menyer inte klipps på mindre skärmar */
-      border: 0;
-      border-radius: 12px;
-      background: #0d1520;
-      overflow: auto;
+      flex:1 1 auto; width:100%; height:70vh; min-height:600px;
+      border:0; border-radius:12px; background:#0d1520; overflow:auto;
     }
+
+    /* --- Watermark-bakgrund med Halmstads logga --- */
+    :root{
+      --watermark-opacity: 0.06;          /* 0.04–0.10 lagom */
+      --watermark-size: min(60vw, 800px); /* loggans storlek */
+    }
+    body::before{
+      content:"";
+      position:fixed; inset:0; z-index:0;
+      background:
+        radial-gradient(transparent 0, transparent 30%, rgba(0,0,0,0.08) 100%) center/200% 200% no-repeat,
+        url("assets/halmstad-logo.svg") center/var(--watermark-size) no-repeat;
+      opacity:var(--watermark-opacity);
+      pointer-events:none;
+    }
+    body, header, nav, .panel, .card, #map { position:relative; z-index:1; }
+    @media (prefers-reduced-motion: reduce){ body::before{ background-attachment:initial; } }
   </style>
 </head>
 <body>
 
+<!-- Header med logga -->
 <header>
-  <h1>Kris Halmstad</h1>
+  <div class="brand">
+    <img src="assets/halmstad-logo.svg" alt="Halmstads kommun" loading="eager" decoding="async" />
+    <h1>Kris Halmstad</h1>
+  </div>
 </header>
 
+<!-- Flikar -->
 <nav>
   <button data-tab="justnu" class="active">Just nu</button>
   <button data-tab="vma">VMA</button>
@@ -93,7 +107,7 @@
     <button class="btn" onclick="selectTab('vma')">Visa VMA</button>
     <button class="btn-outline" onclick="selectTab('nyheter')">Visa nyheter</button>
 
-    <!-- ⭐ Snabbknapp till lokala Krislägen -->
+    <!-- Snabbknapp till lokala Krislägen -->
     <button class="btn-outline"
       onclick="window.open('krislagen/index.html','_blank','noopener')">
       Öppna Krislägen
@@ -119,19 +133,21 @@
   <div id="map"></div>
 </div>
 
-<!-- PANEL: KRISLÄGEN (Alt A – inbäddad lokal kopia) -->
+<!-- PANEL: KRISLÄGEN (inbäddad lokalkopia) -->
 <div id="panel-krislagen" class="panel panel-embed">
   <h2>Krislägen</h2>
 
-  <!-- Krislägen: ny inbäddad vy + fallback -->
+  <!-- Inbäddad lokalkopia -->
   <iframe
     src="krislagen/index.html"
     class="embed-frame"
+    title="Krislägen – lokal översikt"
     loading="lazy"
     allow="fullscreen; clipboard-read; clipboard-write"
     referrerpolicy="no-referrer-when-downgrade">
   </iframe>
 
+  <!-- Fallback-länk (öppna i ny flik) -->
   <div class="card" style="margin-top:12px;">
     Om något ser konstigt ut:
     <a class="btn btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">
@@ -140,7 +156,6 @@
   </div>
 </div>
 
-
 <script>
   // Fliksystem
   function selectTab(tab){
@@ -148,42 +163,48 @@
     document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
     document.querySelector(`[data-tab='${tab}']`).classList.add("active");
     document.querySelector(`#panel-${tab}`).classList.add("active");
-
     if (tab === "platser") initMap();
   }
-
   document.querySelectorAll("nav button").forEach(btn => {
     btn.onclick = () => selectTab(btn.dataset.tab);
   });
 
-  // Service worker
+  // Service worker (PWA)
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js");
   }
 
   // VMA
   async function loadVMA(){
-    const r = await fetch("https://api.krisinformation.se/v3/vmas?language=sv&counties=" + encodeURIComponent("Hallands län"));
-    const d = await r.json();
-    const box = document.querySelector("#vmaList");
-    box.innerHTML = "";
-    if (!d.length){ box.textContent = "Inga VMA."; return; }
-    d.forEach(i => {
-      box.innerHTML += `<div><strong>${i.Title}</strong><br>${i.Preamble||""}</div><hr>`;
-    });
+    try{
+      const r = await fetch("https://api.krisinformation.se/v3/vmas?language=sv&counties=" + encodeURIComponent("Hallands län"));
+      const d = await r.json();
+      const box = document.querySelector("#vmaList");
+      box.innerHTML = "";
+      if (!Array.isArray(d) || !d.length){ box.textContent = "Inga VMA."; return; }
+      d.forEach(i => {
+        box.innerHTML += `<div><strong>${i.Title||'VMA'}</strong><br>${i.Preamble||i.PushMessage||''}</div><hr>`;
+      });
+    } catch(e){
+      document.querySelector("#vmaList").textContent = "Kunde inte hämta VMA.";
+    }
   }
   loadVMA();
 
   // Nyheter
   async function loadNews(){
-    const r = await fetch("https://api.krisinformation.se/v3/news?language=sv&counties=" + encodeURIComponent("Hallands län"));
-    const d = await r.json();
-    const box = document.querySelector("#newsList");
-    box.innerHTML = "";
-    if (!d.length){ box.textContent = "Inga nyheter."; return; }
-    d.forEach(i => {
-      box.innerHTML += `<div><strong>${i.Title}</strong><br>${i.Preamble||""}</div><hr>`;
-    });
+    try{
+      const r = await fetch("https://api.krisinformation.se/v3/news?language=sv&counties=" + encodeURIComponent("Hallands län"));
+      const d = await r.json();
+      const box = document.querySelector("#newsList");
+      box.innerHTML = "";
+      if (!Array.isArray(d) || !d.length){ box.textContent = "Inga nyheter."; return; }
+      d.forEach(i => {
+        box.innerHTML += `<div><strong>${i.Title||'Nyhet'}</strong><br>${i.Preamble||''}</div><hr>`;
+      });
+    } catch(e){
+      document.querySelector("#newsList").textContent = "Kunde inte hämta nyheter.";
+    }
   }
   loadNews();
 
@@ -192,7 +213,7 @@
   function initMap(){
     if (map) return;
     map = L.map("map").setView([56.673,12.857], 11);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19}).addTo(map);
   }
 </script>
 
