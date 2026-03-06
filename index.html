@@ -1,6 +1,117 @@
+<!doctype html>
+<html lang="sv">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Kris Halmstad – Prototyp</title>
 
-const CACHE = "kris-halmstad-v1";
-const ASSETS = ["/", "/index.html", "/manifest.webmanifest", "/service-worker.js"]; 
-self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS))); });
-self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k))))); });
-self.addEventListener('fetch', e => { e.respondWith(caches.match(e.request).then(r=> r || fetch(e.request))); });
+  <meta name="theme-color" content="#004a7f" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/icon-192.png" />
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+  <style>
+    body { margin:0; font-family:system-ui; background:#0b1116; color:#e7eef6; }
+    header { padding:12px 16px; background:#0d1520; border-bottom:1px solid #223042; }
+    h1 { margin:0; font-size:20px; }
+    nav { display:flex; gap:8px; background:#0d1520; padding:8px; position:sticky; top:52px; }
+    nav button { padding:8px 12px; border-radius:10px; background:#121a22; color:#e7eef6; border:1px solid #223042; cursor:pointer; }
+    nav button.active { border-color:#0072ce; background:#101c29; }
+    .panel { display:none; padding:16px; }
+    .panel.active { display:block; }
+    .card { padding:12px; border-radius:12px; background:#121a22; border:1px solid #223042; margin-bottom:12px; }
+    #map { height:360px; border-radius:12px; border:1px solid #223042; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Kris Halmstad</h1>
+</header>
+
+<nav>
+  <button data-tab="justnu" class="active">Just nu</button>
+  <button data-tab="vma">VMA</button>
+  <button data-tab="nyheter">Nyheter</button>
+  <button data-tab="platser">Platser</button>
+</nav>
+
+<!-- Panels -->
+<div id="panel-justnu" class="panel active">
+  <div class="card">
+    <h3>Följ aktuell information</h3>
+    <p>Se VMA, nyheter och larmpunkter.</p>
+  </div>
+</div>
+
+<div id="panel-vma" class="panel">
+  <h2>VMA</h2>
+  <div id="vmaList" class="card">Laddar…</div>
+</div>
+
+<div id="panel-nyheter" class="panel">
+  <h2>Nyheter</h2>
+  <div id="newsList" class="card">Laddar…</div>
+</div>
+
+<div id="panel-platser" class="panel">
+  <h2>Platser</h2>
+  <div id="map"></div>
+</div>
+
+<script>
+  // Tabs
+  document.querySelectorAll("nav button").forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
+      document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      btn.classList.add("active");
+      document.querySelector("#panel-" + btn.dataset.tab).classList.add("active");
+      if (btn.dataset.tab === "platser") initMap();
+    };
+  });
+
+  // Service worker
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+  }
+
+  // VMA
+  async function loadVMA() {
+    const r = await fetch("https://api.krisinformation.se/v3/vmas?language=sv&counties=" + encodeURIComponent("Hallands län"));
+    const d = await r.json();
+    const box = document.querySelector("#vmaList");
+    box.innerHTML = "";
+    if (!d.length) return box.textContent = "Inga VMA.";
+    d.forEach(x => {
+      box.innerHTML += `<div><strong>${x.Title}</strong><br>${x.Preamble||""}</div><hr>`;
+    });
+  }
+  loadVMA();
+
+  // Nyheter
+  async function loadNews() {
+    const r = await fetch("https://api.krisinformation.se/v3/news?language=sv&counties=" + encodeURIComponent("Hallands län"));
+    const d = await r.json();
+    const box = document.querySelector("#newsList");
+    box.innerHTML = "";
+    if (!d.length) return box.textContent = "Inga nyheter.";
+    d.forEach(x => {
+      box.innerHTML += `<div><strong>${x.Title}</strong><br>${x.Preamble||""}</div><hr>`;
+    });
+  }
+  loadNews();
+
+  // Map
+  let map;
+  function initMap() {
+    if (map) return;
+    map = L.map("map").setView([56.673, 12.857], 11);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+  }
+</script>
+
+</body>
+</html>
