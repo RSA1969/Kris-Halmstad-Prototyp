@@ -1,0 +1,17 @@
+# Kris Halmstad – Prototyp
+
+En fristående PWA‑prototyp för krisinformation.
+
+## Kör lokalt
+Öppna `index.html` i en webbläsare, eller kör en enkel server:
+
+```bash
+python3 -m http.server 8000
+# http://127.0.0.1:8000/index.html
+```
+
+## Publicera
+Ladda upp filerna i denna mapp till ditt GitHub‑repo och/eller koppla till **Azure Static Web Apps**.
+
+## GIS‑källa
+Under fliken **Platser** kan du ange OGC API – Features, WFS eller ArcGIS Feature Service.
