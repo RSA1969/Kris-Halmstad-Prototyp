@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="sv">
 <head>
@@ -8,7 +7,7 @@
 
   <meta name="theme-color" content="#004a7f" />
   <link rel="manifest" href="manifest.webmanifest" />
-  <link rel="icon" href="icons/icon-192.png">
+  <link rel="icon" href="icons/icon-192.png" />
 
   <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -52,9 +51,17 @@
     .btn-outline { background:transparent; color:#0072ce; }
 
     /* --- Krislägen (inbäddad vy) --- */
-    .panel-embed {
-      display:flex; flex-direction:column; gap:12px; padding:16px;
+    /* Grundregel: paneler dolda; .panel.active visar panelen */
+    .panel.panel-embed {
+      /* inget display här → följer .panel-regeln och är DOLD */
+      padding:16px;
       min-height:calc(100vh - 120px);
+    }
+    /* Visa som flex ENDAST när panelen är aktiv */
+    .panel.panel-embed.active {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
     }
     .embed-frame {
       flex:1 1 auto; width:100%; height:70vh; min-height:600px;
@@ -138,21 +145,17 @@
   <h2>Krislägen</h2>
 
   <!-- Inbäddad lokalkopia -->
-  <iframe
-    src="krislagen/index.html"
-    class="embed-frame"
-    title="Krislägen – lokal översikt"
-    loading="lazy"
-    allow="fullscreen; clipboard-read; clipboard-write"
-    referrerpolicy="no-referrer-when-downgrade">
+  <iframe class="embed-frame"
+          src="krislagen/index.html"
+          title="Krislägen – Halmstad"
+          allow="fullscreen; clipboard-read; clipboard-write"
+          referrerpolicy="no-referrer-when-downgrade">
   </iframe>
 
   <!-- Fallback-länk (öppna i ny flik) -->
   <div class="card" style="margin-top:12px;">
     Om något ser konstigt ut:
-    <a class="btn btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">
-      Öppna Krislägen i hel flik
-    </a>
+    <a class="btn btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
   </div>
 </div>
 
