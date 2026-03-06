@@ -10,10 +10,7 @@
   <link rel="icon" href="icons/icon-192.png" />
 
   <!-- Leaflet -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
@@ -37,8 +34,7 @@
 
     /* Paneler & kort */
     .panel { display:none; padding:16px; }
-    .panel.active { display:block; } /* standard: visa block när aktiv */
-
+    .panel.active { display:block; } /* standard: synlig bara när .active */
     .card {
       padding:12px; border-radius:12px; background:#121a22;
       border:1px solid #223042; margin-bottom:12px;
@@ -55,14 +51,10 @@
     .btn-outline { background:transparent; color:#0072ce; }
 
     /* --- Krislägen (inbäddad vy) --- */
-    /* OBS: panel är dold som standard; gör den FLEX först när den är aktiv */
-    .panel.panel-embed {
-      /* inget display-värde här → följer .panel (dold) */
-      padding:16px;
-      min-height:calc(100vh - 120px);
-    }
+    /* Följ .panel-regeln: dold i grundläge; blir flex ENDAST när aktiv */
+    .panel.panel-embed { padding:16px; min-height:calc(100vh - 120px); }
     .panel.panel-embed.active {
-      display:flex;                 /* visas bara när aktiv */
+      display:flex;              /* visas endast i aktivt läge */
       flex-direction:column;
       gap:12px;
     }
@@ -147,24 +139,23 @@
 <div id="panel-krislagen" class="panel panel-embed">
   <h2>Krislägen</h2>
 
-  <!-- Inbäddad lokalkopia -->
   <iframe
-    src="krislagen/index.html"
     class="embed-frame"
-    title="Krislägen – lokal kopia"
-    sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
+    src="krislagen/index.html"
+    title="Krislägen – lokal vy"
+    loading="lazy"
     referrerpolicy="no-referrer-when-downgrade"
-  ></iframe>
+    allow="fullscreen; clipboard-read; clipboard-write">
+  </iframe>
 
-  <!-- Fallback-länk (öppna i ny flik) -->
   <div class="card" style="margin-top:12px;">
     Om något ser konstigt ut:
-    <a class="btn btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
+    <a class="btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
   </div>
 </div>
 
 <script>
-  // Init när DOM är redo (säkerställer att knapparna kopplas)
+  // Init när DOM är redo (säkrar att knapparna kopplas)
   document.addEventListener('DOMContentLoaded', () => {
     // Fliksystem
     function selectTab(tab){
@@ -175,10 +166,12 @@
       if (btn) btn.classList.add("active");
       if (panel) panel.classList.add("active");
       if (tab === "platser") initMap();
+      // Scrolla upp lite när man byter panel (valfritt)
+      window.scrollTo({ top: 0, behavior: "instant" });
     }
-    window.selectTab = selectTab; // för onClick i knappar
+    window.selectTab = selectTab; // behövs för onClick i knappar
 
-    // Koppla knappar
+    // Koppla nav-knappar
     document.querySelectorAll("nav button").forEach(btn => {
       btn.addEventListener("click", () => selectTab(btn.dataset.tab));
     });
