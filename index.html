@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="sv">
 <head>
@@ -48,6 +49,25 @@
     }
     .btn { background:#0072ce; color:white; }
     .btn-outline { background:transparent; color:#0072ce; }
+
+    /* --- Krislägen (inbäddad vy) --- */
+    .panel-embed {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding: 16px;
+      min-height: calc(100vh - 120px); /* justera vid behov */
+    }
+    .embed-frame {
+      flex: 1 1 auto;
+      width: 100%;
+      height: 70vh;            /* reservhöjd */
+      min-height: 600px;       /* så att menyer inte klipps på mindre skärmar */
+      border: 0;
+      border-radius: 12px;
+      background: #0d1520;
+      overflow: auto;
+    }
   </style>
 </head>
 <body>
@@ -73,9 +93,9 @@
     <button class="btn" onclick="selectTab('vma')">Visa VMA</button>
     <button class="btn-outline" onclick="selectTab('nyheter')">Visa nyheter</button>
 
-    <!-- ⭐ NY knapp (Steg 3) -->
+    <!-- ⭐ Snabbknapp till lokala Krislägen -->
     <button class="btn-outline"
-      onclick="window.open('https://krisapp.lovable.app/krislagen','_blank','noopener')">
+      onclick="window.open('krislagen/index.html','_blank','noopener')">
       Öppna Krislägen
     </button>
   </div>
@@ -99,20 +119,24 @@
   <div id="map"></div>
 </div>
 
-<!-- PANEL: KRISLÄGEN (Alt A – inbäddad iframe) -->
-<div id="panel-krislagen" class="panel">
+<!-- PANEL: KRISLÄGEN (Alt A – inbäddad lokal kopia) -->
+<div id="panel-krislagen" class="panel panel-embed">
   <h2>Krislägen</h2>
 
-  <!-- Inbäddad version -->
-  <div class="card" style="padding:0; overflow:hidden;">
-    https://krisapp.lovable.app/krislagen
-    </iframe>
-  </div>
+  <!-- Krislägen: ny inbäddad vy + fallback -->
+  <iframe
+    src="krislagen/index.html"
+    class="embed-frame"
+    loading="lazy"
+    allow="fullscreen; clipboard-read; clipboard-write"
+    referrerpolicy="no-referrer-when-downgrade">
+  </iframe>
 
-  <!-- Fallback-länk -->
   <div class="card" style="margin-top:12px;">
-    Om sidan inte visas ovan:
-    https://krisapp.lovable.app/krislagenÖppna Krislägen i ny flik</a>
+    Om något ser konstigt ut:
+    <a class="btn btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">
+      Öppna Krislägen i hel flik
+    </a>
   </div>
 </div>
 
@@ -173,3 +197,4 @@
 </script>
 
 </body>
+</html>
