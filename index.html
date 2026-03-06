@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="sv">
 <head>
@@ -10,11 +11,8 @@
   <link rel="icon" href="icons/icon-192.png" />
 
   <!-- Leaflet -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 
   <style>
     /* Baslayout */
@@ -37,7 +35,7 @@
 
     /* Paneler & kort */
     .panel { display:none; padding:16px; }
-    .panel.active { display:block; } /* visas endast när aktiv */
+    .panel.active { display:block; }
     .card { padding:12px; border-radius:12px; background:#121a22; border:1px solid #223042; margin-bottom:12px; }
 
     /* Karta */
@@ -48,7 +46,7 @@
     .btn{ background:#0072ce; color:#fff; }
     .btn-outline{ background:transparent; color:#0072ce; }
 
-    /* Krislägen (inbäddad) — dold i grundläge, blir flex ENDAST när aktiv */
+    /* Krislägen (inbäddad) — dold i grundläge, flex när aktiv */
     .panel.panel-embed { padding:16px; min-height:calc(100vh - 120px); }
     .panel.panel-embed.active { display:flex; flex-direction:column; gap:12px; }
     .embed-frame {
@@ -122,14 +120,7 @@
 <div id="panel-krislagen" class="panel panel-embed">
   <h2>Krislägen</h2>
 
-  <iframe
-    class="embed-frame"
-    src="krislagen/index.html"
-    title="Krislägen – lokal kopia"
-    loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade"
-    allow="fullscreen; clipboard-read; clipboard-write">
-  </iframe>
+  <iframe src="krislagen/index.html" class="embed-frame" title="Krislägen"></iframe>
 
   <div class="card" style="margin-top:12px;">
     Om något ser konstigt ut:
@@ -138,10 +129,9 @@
 </div>
 
 <script>
-  // Kör först när DOM finns så att eventkoppling inte missar knapparna
+  // Kör när DOM är redo – säkrar att event kopplas
   document.addEventListener('DOMContentLoaded', () => {
 
-    // Fliksystem
     function selectTab(tab){
       document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
       document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
@@ -150,22 +140,18 @@
       if (btn) btn.classList.add("active");
       if (panel) panel.classList.add("active");
       if (tab === "platser") initMap();
-      // (valfritt) Scrolla upp
-      // window.scrollTo({ top: 0, behavior: "instant" });
     }
-    window.selectTab = selectTab; // så inline onclick fungerar
+    window.selectTab = selectTab; // behövs för onclick
 
-    // Koppla klick på flikknapparna
-    document.querySelectorAll("nav button").forEach(btn => {
-      btn.addEventListener("click", () => selectTab(btn.dataset.tab));
-    });
+    document.querySelectorAll("nav button").forEach(btn =>
+      btn.addEventListener("click", () => selectTab(btn.dataset.tab))
+    );
 
-    // Startladdning av data
     loadVMA();
     loadNews();
   });
 
-  // Service worker (PWA)
+  // PWA – registrera SW efter att sidan laddats
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("service-worker.js").catch(()=>{});
