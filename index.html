@@ -8,38 +8,65 @@
 
   <!-- PWA -->
   <meta name="theme-color" content="#004a7f" />
-  manifest.webmanifest
-  icons/icon-192.png
-  icons/icon-512.png
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="icon" sizes="512x512" href="icons/icon-512.png" />
 
   <!-- Leaflet (map) -->
-  https://unpkg.com/leaflet@1.9.4/dist/leaflet.css
-  https://unpkg.com/leaflet@1.9.4/dist/leaflet.js</script>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRRE+3s="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIJ4hVr3Z7jS1h2Rn6UtiwLkS0hG3jY="
+    crossorigin=""
+  ></script>
 
-  <!-- Esri Leaflet (only used if you choose ArcGIS Feature Service in the GIS form) -->
-  https://unpkg.com/esri-leaflet@3/dist/esri-leaflet.js</script>
+  <!-- Esri Leaflet (valfritt, behövs endast om du använder ArcGIS Feature Service) -->
+  <script src="https://unpkg.com/esri-leaflet@3/dist/esri-leaflet.js"></script>
 
   <style>
     :root {
-      --brand: #004a7f; --brand-2:#0072ce; --bg:#0b1116; --card:#121a22; --border:#223042;
+      --brand:#004a7f; --brand-2:#0072ce; --bg:#0b1116; --card:#121a22; --border:#223042;
       --text:#e7eef6; --muted:#a6b7c8; --accent:#14b8a6; --error:#ff6b6b;
+
+      /* Watermark från kod 1 */
+      --watermark-opacity: 0.06;          /* 0.04–0.10 lagom */
+      --watermark-size: min(60vw, 800px); /* loggans storlek */
     }
     * { box-sizing: border-box }
     html, body {
       margin:0; padding:0; background:var(--bg); color:var(--text);
       font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans";
     }
+
+    /* Watermark-bakgrund med Halmstads logga */
+    body::before{
+      content:"";
+      position:fixed; inset:0; z-index:0;
+      background:
+        radial-gradient(transparent 0, transparent 30%, rgba(0,0,0,0.08) 100%) center/200% 200% no-repeat,
+        url("assets/halmstad-logo.svg") center/var(--watermark-size) no-repeat;
+      opacity:var(--watermark-opacity);
+      pointer-events:none;
+    }
+
     .app-header {
       display:flex; align-items:center; justify-content:space-between;
       padding:12px 16px; border-bottom:1px solid var(--border); background:#0d1520; position:sticky; top:0; z-index:5;
     }
     .brand { display:flex; align-items:center; gap:12px; }
-    .logo-circle { width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg,var(--brand),var(--brand-2)); }
-    h1 { margin:0; font-size:18px } .subtitle{margin:0; font-size:12px; color:var(--muted)}
+    .brand img.logo { height:32px; width:auto; display:block; }
+    h1 { margin:0; font-size:18px }
+    .subtitle{margin:0; font-size:12px; color:var(--muted)}
     .tabs { display:grid; grid-auto-flow:column; gap:4px; padding:8px; background:#0d1520; position:sticky; top:60px; z-index:4;}
     .tab { padding:10px 12px; border:1px solid var(--border); background:transparent; color:var(--text); border-radius:10px; cursor:pointer; }
     .tab.active { border-color:var(--brand-2); background:#101c29; }
-    main { padding:16px; }
+
+    main { padding:16px; position:relative; z-index:1; }
     .panel { display:none } .panel.active{ display:block }
     .cards { display:grid; gap:12px; }
     @media(min-width:720px){ .cards{ grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -52,7 +79,7 @@
     .btn,.btn-outline{ padding:8px 12px; border-radius:10px; font-weight:600; cursor:pointer; border:1px solid var(--brand-2)}
     .btn{ background:var(--brand-2); color:#fff } .btn-outline{ background:transparent; color:var(--brand-2)}
     .muted{ color:var(--muted) } .error{ color:var(--error) }
-    .app-footer{ padding:16px; border-top:1px solid var(--border); color:var(--muted); text-align:center }
+    .app-footer{ padding:16px; border-top:1px solid var(--border); color:var(--muted); text-align:center; position:relative; z-index:1; }
 
     /* Platser/karta */
     .map-container{ width:100%; height:360px; border:1px solid var(--border); border-radius:12px; background:#0f1720; margin-top:8px }
@@ -62,13 +89,24 @@
     .map-toolbar{ display:flex; gap:8px; justify-content:flex-end; margin-top:6px }
     .form-row{ display:grid; gap:8px; grid-template-columns: 1fr 2fr; align-items:center; margin:6px 0 }
     .form-row input, .form-row select{ width:100%; background:#0e1620; border:1px solid var(--border); color:var(--text); border-radius:8px; padding:8px }
-    .form-help{ color:var(--muted); font-size:12px; margin-top:4px }
+
+    /* Krislägen (inbäddad) – från kod 1, anpassad till denna layout */
+    .panel.panel-embed { min-height:calc(100vh - 160px); }
+    .panel.panel-embed.active {
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+    .embed-frame {
+      flex:1 1 auto; width:100%; height:70vh; min-height:600px;
+      border:0; border-radius:12px; background:#0d1520; overflow:auto;
+    }
   </style>
 </head>
 <body>
   <header class="app-header">
     <div class="brand">
-      <div class="logo-circle" aria-hidden="true"></div>
+      <img class="logo" src="assets/halmstad-logo.svg" alt="Halmstads kommun" />
       <div>
         <h1>Kris Halmstad</h1>
         <p class="subtitle">Prototyp – information vid olyckor och kriser</p>
@@ -82,6 +120,7 @@
     <button class="tab" data-tab="vma" role="tab" aria-selected="false">VMA</button>
     <button class="tab" data-tab="nyheter" role="tab" aria-selected="false">Nyheter</button>
     <button class="tab" data-tab="platser" role="tab" aria-selected="false">Platser</button>
+    <button class="tab" data-tab="krislagen" role="tab" aria-selected="false">Krislägen</button>
     <button class="tab" data-tab="om" role="tab" aria-selected="false">Om</button>
   </nav>
 
@@ -94,8 +133,9 @@
           <h3>Följ aktuell information</h3>
           <p>Installera appen för snabb åtkomst. VMA och nyheter hämtas från Krisinformation.se.</p>
           <div class="actions">
-            <button class="btn" onclick="document.querySelector('[data-tab=\\'vma\\']').click()">Visa VMA</button>
-            <button class="btn btn-outline" onclick="document.querySelector('[data-tab=\\'nyheter\\']').click()">Visa nyheter</button>
+            <button class="btn" onclick="document.querySelector('[data-tab=\'vma\']').click()">Visa VMA</button>
+            <button class="btn btn-outline" onclick="document.querySelector('[data-tab=\'nyheter\']').click()">Visa nyheter</button>
+            <button class="btn btn-outline" onclick="window.open('krislagen/index.html','_blank','noopener')">Öppna Krislägen</button>
           </div>
         </div>
       </div>
@@ -124,7 +164,7 @@
       <details open>
         <summary>Larmpunkter (om 112 inte fungerar)</summary>
 
-        <!-- Konfig-ruta så du kan klistra in er GIS-källa direkt i webben -->
+        <!-- Konfig-ruta – koppla GIS-källa direkt -->
         <div class="card">
           <h3>Koppla GIS-källa</h3>
 
@@ -138,34 +178,34 @@
           </div>
 
           <div class="form-row">
-            <label id="labelBase">Bas‑URL</label>
+            <label id="labelBase" for="baseUrl">Bas‑URL</label>
             <input id="baseUrl" placeholder="OGC: https://geo.example.se/ogcapi  •  WFS: https://server/wfs  •  Esri: lämna tomt" />
           </div>
 
           <div class="form-row">
-            <label id="labelLayer">Samling/Lager</label>
+            <label id="labelLayer" for="collectionOrType">Samling/Lager</label>
             <input id="collectionOrType" placeholder="OGC: collectionId  •  WFS: workspace:layer  •  Esri: lämna tomt" />
           </div>
 
           <div class="form-row">
-            <label>ArcGIS Feature Layer URL</label>
+            <label for="esriUrl">ArcGIS Feature Layer URL</label>
             <input id="esriUrl" placeholder="https://.../FeatureServer/0" />
           </div>
 
           <div class="form-row">
-            <label>Fältnamn</label>
+            <label for="fieldNames">Fältnamn</label>
             <input id="fieldNames" placeholder="name,address  (kommaseparerat)" value="name,address" />
           </div>
 
           <div class="form-row">
-            <label>Filter (valfritt)</label>
+            <label for="filterExpr">Filter (valfritt)</label>
             <input id="filterExpr" placeholder="OGC: limit=1000;bbox=minx,miny,maxx,maxy  •  WFS: cql=kommun='Halmstad'  •  Esri: where=1=1" />
           </div>
 
           <div class="actions">
             <button class="btn" id="loadGisBtn">Ladda från GIS</button>
-            <button class="btn-outline" id="clearGisBtn">Rensa</button>
-            <span class="form-help">Tips: Inställningar sparas i denna webbläsares localStorage.</span>
+            <button class="btn btn-outline" id="clearGisBtn">Rensa</button>
+            <span class="source">Inställningar sparas i denna webbläsares localStorage.</span>
           </div>
         </div>
 
@@ -182,6 +222,22 @@
         <summary>Trygghetspunkter (öppnas vid behov)</summary>
         <div class="cards muted"><div>Inga aktiva trygghetspunkter just nu.</div></div>
       </details>
+    </section>
+
+    <!-- KRISLÄGEN (inbäddad vy från kod 1) -->
+    <section id="panel-krislagen" class="panel panel-embed" aria-labelledby="krislagen">
+      <h2>Krislägen</h2>
+      <iframe
+        class="embed-frame"
+        src="krislagen/index.html"
+        title="Krislägen – inbäddad vy"
+        loading="lazy"
+        referrerpolicy="no-referrer"
+      ></iframe>
+
+      <div class="card" style="margin-top:12px;">
+        Om något ser konstigt ut: <a class="btn btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
+      </div>
     </section>
 
     <!-- OM -->
@@ -204,15 +260,16 @@
     // ---------- Tabs ----------
     const TABS = document.querySelectorAll('.tab');
     const PANELS = document.querySelectorAll('.panel');
-    TABS.forEach(btn => {
-      btn.addEventListener('click', () => {
-        TABS.forEach(b => b.classList.remove('active'));
-        PANELS.forEach(p => p.classList.remove('active'));
-        btn.classList.add('active');
-        document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
-        if (btn.dataset.tab === 'platser') ensureMap();
+    function selectTab(id) {
+      TABS.forEach(b => {
+        const active = b.dataset.tab === id;
+        b.classList.toggle('active', active);
+        b.setAttribute('aria-selected', active ? 'true' : 'false');
       });
-    });
+      PANELS.forEach(p => p.classList.toggle('active', p.id === `panel-${id}`));
+      if (id === 'platser') ensureMap();
+    }
+    TABS.forEach(btn => btn.addEventListener('click', () => selectTab(btn.dataset.tab)));
 
     // ---------- PWA: Install prompt + SW registration ----------
     let deferredPrompt;
@@ -249,7 +306,7 @@
     }
 
     function linkCard(title, body, url, meta='') {
-      const a = url ? `${url}Läs mer</a>` : '';
+      const a = url ? `<a class="btn btn-outline" href="${url}" target="_blank" rel="noopener">Läs mer</a>` : '';
       const m = meta ? `<div class="meta">${meta}</div>` : '';
       return `<article class="card"><h3>${title}</h3><p>${body||''}</p>${m}<div class="actions">${a}<span class="source">Källa: Krisinformation.se</span></div></article>`;
     }
@@ -257,7 +314,7 @@
     async function loadVMA() {
       const vmaList = document.getElementById('vmaList');
       try {
-        const res = await fetch(`${KRIS_API}/vmas?language=sv&counties=${HALLAND}`);
+        const res = await fetch(`${KRIS_API}/vmas?language=sv&counties=${HALLAND}`, { headers: { accept:'application/json' }});
         if (!res.ok) throw new Error(res.statusText);
         const data = await res.json();
         if (!Array.isArray(data) || !data.length) {
@@ -268,18 +325,19 @@
           const title = item.Title || item.Headline || 'VMA';
           const desc  = item.PushMessage || item.Preamble || item.BodyText || '';
           const link  = item.Web || item.Link || '';
-          const meta  = [item.Sent&&`Publicerad ${formatDate(item.Sent)}`, item.Counties?.join(', ')].filter(Boolean).join(' • ');
+          const meta  = [item.Sent && `Publicerad ${formatDate(item.Sent)}`, Array.isArray(item.Counties)&&item.Counties.join(', ')].filter(Boolean).join(' • ');
           return linkCard(title, desc, link, meta);
         }).join('');
       } catch (e) {
-        vmaList.innerHTML = `<div class="error">Kunde inte hämta VMA.</div>`;
+        console.error(e);
+        vmaList.innerHTML = `<div class="card"><h3>Fel</h3><p class="error">Kunde inte hämta VMA.</p></div>`;
       }
     }
 
     async function loadNews() {
       const newsList = document.getElementById('newsList');
       try {
-        const res = await fetch(`${KRIS_API}/news?language=sv&counties=${HALLAND}&numberOfNewsArticles=10`);
+        const res = await fetch(`${KRIS_API}/news?language=sv&counties=${HALLAND}&numberOfNewsArticles=10`, { headers: { accept:'application/json' }});
         if (!res.ok) throw new Error(res.statusText);
         const data = await res.json();
         if (!Array.isArray(data) || !data.length) {
@@ -294,11 +352,13 @@
           return linkCard(title, desc, link, meta);
         }).join('');
       } catch (e) {
-        newsList.innerHTML = `<div class="error">Kunde inte hämta nyheter.</div>`;
+        console.error(e);
+        newsList.innerHTML = `<div class="card"><h3>Fel</h3><p class="error">Kunde inte hämta nyheter.</p></div>`;
       }
     }
 
-    loadVMA(); loadNews();
+    loadVMA();
+    loadNews();
 
     // ---------- Karta + GIS-källa ----------
     let map, markersLayer;
@@ -307,9 +367,14 @@
 
     function ensureMap(){
       if (map) return;
+      if (typeof L === 'undefined') {
+        console.warn('Leaflet kunde inte laddas.');
+        return;
+      }
       map = L.map('map', { scrollWheelZoom:true });
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
-        maxZoom:19, attribution:'&copy; OpenStreetMap'
+        maxZoom:19,
+        attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
       }).addTo(map);
       markersLayer = L.layerGroup().addTo(map);
       map.setView([56.673, 12.857], 11); // Halmstad med omnejd
@@ -326,7 +391,7 @@
       }
       alarmPointsList.innerHTML = items.map(i => {
         const url = googleMapsLink(`${i.name} ${i.address||''}`);
-        return `<li><strong>${i.name}</strong><br/>${i.address||''}<br/>${url}Öppna i kartapp</a></li>`;
+        return `<li><strong>${i.name}</strong><br/>${i.address||''}<br/><a href="${url}" target="_blank" rel="noopener">Öppna i kartapp</a></li>`;
       }).join('');
       fitMapBtn.disabled = false;
       const b = L.latLngBounds(items.map(i => i.latlng));
@@ -353,7 +418,7 @@
     }
 
     async function loadFromWFS(url, typeName, nameField, addrField, extra){
-      // NOTE: Requires CORS enabled on your WFS server or a proxy/JSONP setup.
+      // Obs: Kräver CORS på WFS-servern eller proxy/JSONP.
       const params = new URLSearchParams({
         service:'WFS', version:'1.1.0', request:'GetFeature',
         typeName, srsName:'EPSG:4326', outputFormat:'application/json'
@@ -376,6 +441,7 @@
     function loadFromEsri(esriUrl, nameField, addrField, where){
       return new Promise((resolve, reject)=>{
         try{
+          if (!L.esri) throw new Error('Esri Leaflet saknas.');
           const layer = L.esri.featureLayer({
             url: esriUrl, where: where || '1=1',
             pointToLayer: (geojson, latlng)=>L.marker(latlng)
@@ -398,7 +464,7 @@
 
     function parseExtra(s){
       if (!s) return null;
-      // Parse simple key=value pairs separated by ";" or ","
+      // key=value separerade med ; eller ,
       const parts = s.split(/\s*;\s*|\s*,\s*/).filter(Boolean);
       const out = {};
       parts.forEach(p=>{
@@ -410,7 +476,7 @@
     }
 
     async function handleLoadGIS(){
-      ensureMap(); markersLayer.clearLayers();
+      ensureMap(); if (markersLayer) markersLayer.clearLayers();
       alarmPointsList.innerHTML = `<li class="muted">Hämtar från GIS …</li>`;
 
       const mode = document.getElementById('gisMode').value;
@@ -441,11 +507,11 @@
         return;
       }
 
-      // Lägg markörer & rendera lista
+      // Markörer & lista
       items.forEach(i => L.marker(i.latlng).addTo(markersLayer).bindPopup(`<strong>${i.name}</strong><br>${i.address||''}`));
       renderAlarmList(items);
 
-      // Persist settings locally
+      // Spara lokalt
       const cfg = {
         mode,
         baseUrl: document.getElementById('baseUrl').value,
@@ -469,7 +535,7 @@
       document.getElementById('filterExpr').value = '';
     });
 
-    // Restore saved GIS settings on load
+    // Återställ sparade GIS-inställningar vid laddning
     (function restore(){
       const raw = localStorage.getItem('kris-halmstad-gis');
       if (!raw) return;
