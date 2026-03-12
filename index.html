@@ -8,17 +8,12 @@
   <!-- PWA -->
   <meta name="theme-color" content="#004a7f" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="./icons/icon-512.png" />
+  <link rel="icon" href="./icons/icon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="./icons/icon-512.png" sizes="512x512" />
 
   <!-- Leaflet (karta) -->
-  <link rel="stylesheet"
-        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity=""
-        crossorigin="anonymous" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-          integrity=""
-          crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 
   <style>
     /* Baslayout */
@@ -49,8 +44,8 @@
 
     /* Knappar */
     .btn, .btn-outline { padding:8px 12px; border-radius:10px; font-weight:600; cursor:pointer; border:1px solid #0072ce; }
-    .btn{ background:#0072ce; color:#fff; }
-    .btn-outline{ background:transparent; color:#0072ce; }
+    .btn { background:#0072ce; color:#fff; }
+    .btn-outline { background:transparent; color:#0072ce; }
 
     /* --- Krislägen (inbäddad vy) --- */
     /* Dold i grundläge; blir flex ENDAST när aktiv */
@@ -99,8 +94,8 @@
     <h3>Följ aktuell information</h3>
     <p>Se VMA, nyheter och larmpunkter.</p>
 
-    <button class="btn" onclick="selectTab('vma')">Visa VMA</button>
-    <button class="btn-outline" onclick="selectTab('nyheter')">Visa nyheter</button>
+    <button class="btn" data-goto="vma">Visa VMA</button>
+    <button class="btn-outline" data-goto="nyheter">Visa nyheter</button>
     <button class="btn-outline" onclick="window.open('./krislagen/index.html','_blank','noopener')">Öppna Krislägen</button>
   </div>
 </div>
@@ -127,22 +122,24 @@
 <div id="panel-krislagen" class="panel panel-embed">
   <h2>Krislägen</h2>
 
-  <iframe src="./krislagen/index.html"
-          class="embed-frame"
-          title="Krislägen (lokalt innehåll)"
-          loading="lazy"
-          referrerpolicy="no-referrer"></iframe>
+  <iframe
+    src="./krislagen/index.html"
+    class="embed-frame"
+    title="Krislägen – lokala sidor"
+    loading="lazy"
+    referrerpolicy="no-referrer-when-downgrade">
+  </iframe>
 
   <div class="card" style="margin-top:12px;">
     Om något ser konstigt ut:
-    <a href="./krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
+    <a class="btn-outline" href="./krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
   </div>
 </div>
 
 <script>
-  // Kör när DOM är redo – säkrar att knappar kopplas
+  // Kör när DOM är redo – säkrar att event kopplas
   document.addEventListener('DOMContentLoaded', () => {
-    function selectTab(tab){
+    function showTab(tab){
       document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
       document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
       const btn = document.querySelector(`[data-tab='${tab}']`);
@@ -151,17 +148,21 @@
       if (panel) panel.classList.add("active");
       if (tab === "platser") initMap();
     }
-    window.selectTab = selectTab; // för onclick i knappar
-
+    // Koppla flik-knappar
     document.querySelectorAll("nav button").forEach(btn =>
-      btn.addEventListener("click", () => selectTab(btn.dataset.tab))
+      btn.addEventListener("click", () => showTab(btn.dataset.tab))
+    );
+    // Koppla "snabbknappar" i Just nu
+    document.querySelectorAll("[data-goto]").forEach(btn =>
+      btn.addEventListener("click", () => showTab(btn.dataset.goto))
     );
 
+    // Ladda data
     loadVMA();
     loadNews();
   });
 
-  // PWA – registrera SW efter att sidan laddats
+  // PWA – registrera SW när sidan laddats
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
