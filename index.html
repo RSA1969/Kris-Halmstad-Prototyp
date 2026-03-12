@@ -58,8 +58,7 @@
     body::before{
       content:""; position:fixed; inset:0; z-index:0;
       background:
-        radial-gradient(transparent 0, transparent 30%, rgba(0,0,0,0.08) 100%) center/200% 200% no-repeat,
-        url("assets/halmstad-logo.svg") center/var(--watermark-size) no-repeat;
+        radial-gradient(transparent 0, transparent 30%, rgba(0,0,0,0.08) 100%) center/200% 200% no-repeat;
       opacity:var(--watermark-opacity); pointer-events:none;
     }
     body, header, nav, .panel, .card, #map { position:relative; z-index:1; }
@@ -71,7 +70,6 @@
 <!-- Header med logga -->
 <header>
   <div class="brand">
-    <img src="assets/halmstad-logo.svg" alt="Halmstads kommun" loading="eager" decoding="async" />
     <h1>Kris Halmstad</h1>
   </div>
 </header>
@@ -93,7 +91,7 @@
 
     <button class="btn" onclick="selectTab('vma')">Visa VMA</button>
     <button class="btn-outline" onclick="selectTab('nyheter')">Visa nyheter</button>
-    <button class="btn-outline" onclick="window.open('krislagen/index.html','_blank','noopener')">Öppna Krislägen</button>
+    <button class="btn-outline" onclick="selectTab('krislagen')">Öppna Krislägen</button>
   </div>
 </div>
 
@@ -128,38 +126,72 @@
 </div>
 
 <script>
-  // Kör när DOM är redo – säkrar att event kopplas
+  // Initialize tab system when DOM is ready
   document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM Content Loaded - Initializing tab system');
 
     function selectTab(tab){
+      console.log('Selecting tab:', tab);
+      
+      // Remove active class from all buttons and panels
       document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
       document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+      
+      // Add active class to selected button and panel
       const btn = document.querySelector(`[data-tab='${tab}']`);
       const panel = document.getElementById(`panel-${tab}`);
-      if (btn) btn.classList.add("active");
-      if (panel) panel.classList.add("active");
-      if (tab === "platser") initMap();
+      
+      if (btn) {
+        btn.classList.add("active");
+        console.log('Button activated:', tab);
+      } else {
+        console.warn('Button not found for tab:', tab);
+      }
+      
+      if (panel) {
+        panel.classList.add("active");
+        console.log('Panel activated:', tab);
+      } else {
+        console.warn('Panel not found for tab:', tab);
+      }
+      
+      // Load map when platser tab is selected
+      if (tab === "platser") {
+        setTimeout(initMap, 100);
+      }
     }
-    window.selectTab = selectTab; // behövs för onclick
+    
+    // Make selectTab available globally for onclick handlers
+    window.selectTab = selectTab;
 
-    document.querySelectorAll("nav button").forEach(btn =>
-      btn.addEventListener("click", () => selectTab(btn.dataset.tab))
-    );
+    // Attach click listeners to nav buttons
+    document.querySelectorAll("nav button").forEach(btn => {
+      btn.addEventListener("click", (e) => {
+        console.log('Button clicked:', btn.dataset.tab);
+        selectTab(btn.dataset.tab);
+      });
+    });
 
+    // Load initial data
     loadVMA();
     loadNews();
+    
+    console.log('Tab system initialized');
   });
 
-  // PWA – registrera SW efter att sidan laddats
+  // PWA – register service worker after page load
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
-      navigator.serviceWorker.register("service-worker.js").catch(()=>{});
+      navigator.serviceWorker.register("service-worker.js").catch((err) => {
+        console.log('Service Worker registration failed:', err);
+      });
     });
   }
 
   // VMA - with timeout
   async function loadVMA(){
     try{
+      console.log('Loading VMA data...');
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
       
@@ -170,11 +202,21 @@
       
       const d = await r.json();
       const box = document.querySelector("#vmaList");
+      if (!box) {
+        console.warn('VMA list container not found');
+        return;
+      }
+      
       box.innerHTML = "";
-      if (!Array.isArray(d) || !d.length){ box.textContent = "Inga VMA."; return; }
+      if (!Array.isArray(d) || !d.length){ 
+        box.textContent = "Inga VMA.";
+        console.log('No VMA data');
+        return; 
+      }
       d.forEach(i => {
         box.innerHTML += `<div><strong>${i.Title||'VMA'}</strong><br>${i.Preamble||i.PushMessage||''}</div><hr>`;
       });
+      console.log('VMA data loaded:', d.length, 'items');
     } catch(e){
       const box = document.querySelector("#vmaList");
       if (box) box.textContent = "Kunde inte hämta VMA.";
@@ -185,6 +227,7 @@
   // Nyheter - with timeout
   async function loadNews(){
     try{
+      console.log('Loading news data...');
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
       
@@ -195,11 +238,21 @@
       
       const d = await r.json();
       const box = document.querySelector("#newsList");
+      if (!box) {
+        console.warn('News list container not found');
+        return;
+      }
+      
       box.innerHTML = "";
-      if (!Array.isArray(d) || !d.length){ box.textContent = "Inga nyheter."; return; }
+      if (!Array.isArray(d) || !d.length){ 
+        box.textContent = "Inga nyheter.";
+        console.log('No news data');
+        return; 
+      }
       d.forEach(i => {
         box.innerHTML += `<div><strong>${i.Title||'Nyhet'}</strong><br>${i.Preamble||''}</div><hr>`;
       });
+      console.log('News data loaded:', d.length, 'items');
     } catch(e){
       const box = document.querySelector("#newsList");
       if (box) box.textContent = "Kunde inte hämta nyheter.";
@@ -211,8 +264,14 @@
   let map;
   function initMap(){
     if (map) return;
-    map = L.map("map").setView([56.673,12.857], 11);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19}).addTo(map);
+    console.log('Initializing map...');
+    try {
+      map = L.map("map").setView([56.673,12.857], 11);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {maxZoom:19}).addTo(map);
+      console.log('Map initialized');
+    } catch(e) {
+      console.error('Map initialization error:', e);
+    }
   }
 </script>
 
