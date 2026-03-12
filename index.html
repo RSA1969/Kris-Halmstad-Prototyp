@@ -8,12 +8,22 @@
   <!-- PWA -->
   <meta name="theme-color" content="#004a7f" />
   <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./icons/icon-192.png" sizes="192x192" />
-  <link rel="apple-touch-icon" href="./icons/icon-512.png" sizes="512x512" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-512.png" />
 
   <!-- Leaflet (karta) -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+    defer
+  ></script>
 
   <style>
     /* Baslayout */
@@ -48,7 +58,7 @@
     .btn-outline { background:transparent; color:#0072ce; }
 
     /* --- Krislägen (inbäddad vy) --- */
-    /* Dold i grundläge; blir flex ENDAST när aktiv */
+    /* Dold i grundläge; visas som flex ENDAST när aktiv */
     .panel.panel-embed { padding:16px; min-height:calc(100vh - 120px); }
     .panel.panel-embed.active { display:flex; flex-direction:column; gap:12px; }
     .embed-frame {
@@ -74,7 +84,7 @@
 <!-- Header med logga -->
 <header>
   <div class="brand">
-    <img src="./assets/halmstad-logo.svg" alt="Halmstads kommun" />
+    assets/halmstad-logo.svg
     <h1>Kris Halmstad</h1>
   </div>
 </header>
@@ -122,17 +132,11 @@
 <div id="panel-krislagen" class="panel panel-embed">
   <h2>Krislägen</h2>
 
-  <iframe
-    src="./krislagen/index.html"
-    class="embed-frame"
-    title="Krislägen – lokala sidor"
-    loading="lazy"
-    referrerpolicy="no-referrer-when-downgrade">
-  </iframe>
+  ./krislagen/index.html</iframe>
 
   <div class="card" style="margin-top:12px;">
     Om något ser konstigt ut:
-    <a class="btn-outline" href="./krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
+    ./krislagen/index.htmlÖppna Krislägen i hel flik</a>
   </div>
 </div>
 
@@ -148,11 +152,12 @@
       if (panel) panel.classList.add("active");
       if (tab === "platser") initMap();
     }
-    // Koppla flik-knappar
+
+    // Koppla flikknappar
     document.querySelectorAll("nav button").forEach(btn =>
       btn.addEventListener("click", () => showTab(btn.dataset.tab))
     );
-    // Koppla "snabbknappar" i Just nu
+    // ”Just nu” snabbknappar
     document.querySelectorAll("[data-goto]").forEach(btn =>
       btn.addEventListener("click", () => showTab(btn.dataset.goto))
     );
@@ -214,3 +219,4 @@
 
 </body>
 </html>
+``
