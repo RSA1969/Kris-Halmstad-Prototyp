@@ -1,90 +1,14 @@
-<!doctype html>
-<html lang='sv'>
-<head>
-<meta charset='utf-8'/>
-<meta name='viewport' content='width=device-width,initial-scale=1'/>
-<title>Kris Halmstad – Prototyp</title>
-<meta name='theme-color' content='#004a7f'/>
-<link rel='manifest' href='manifest.webmanifest'/>
-<link rel='icon' href='icons/icon-192.png'/>
-<link rel='stylesheet' href='https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'/>
-<script src='https://unpkg.com/leaflet@1.9.4/dist/leaflet.js'></script>
-<script src='https://unpkg.com/esri-leaflet@3/dist/esri-leaflet.js'></script>
-<style>
-body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial;background:#0b1116;color:#e7eef6}
-header{padding:12px 16px;border-bottom:1px solid #223042;background:#0d1520;position:sticky;top:0}
-.tabs{display:grid;grid-auto-flow:column;gap:4px;padding:8px;background:#0d1520;position:sticky;top:52px}
-.tab{padding:8px 10px;border:1px solid #223042;background:transparent;color:#e7eef6;border-radius:10px}
-.tab.active{border-color:#0072ce;background:#101c29}
-main{padding:16px}.panel{display:none}.panel.active{display:block}
-.card{border:1px solid #223042;background:#121a22;padding:12px;border-radius:12px}
-.btn{padding:8px 12px;border-radius:10px;background:#0072ce;color:#fff;border:1px solid #0072ce}
-.btn-outline{padding:8px 12px;border-radius:10px;background:transparent;color:#0072ce;border:1px solid #0072ce}
-#map{width:100%;height:360px;border:1px solid #223042;border-radius:12px;margin-top:8px}
-</style>
-</head>
-<body>
-<header><h1>Kris Halmstad</h1><button id='installBtn' class='btn-outline' hidden>Installera</button></header>
-<nav class='tabs'>
-  <button class='tab active' data-tab='justnu'>Just nu</button>
-  <button class='tab' data-tab='vma'>VMA</button>
-  <button class='tab' data-tab='nyheter'>Nyheter</button>
-  <button class='tab' data-tab='platser'>Platser</button>
-</nav>
-<main>
-  <section id='panel-justnu' class='panel active'>
-    <div class='card'>
-      <h3>Följ aktuell information</h3>
-      <button class='btn' onclick="document.querySelector('[data-tab=\'vma\']').click()">Visa VMA</button>
-      <button class='btn-outline' onclick="document.querySelector('[data-tab=\'nyheter\']').click()">Visa nyheter</button>
-    </div>
-  </section>
-  <section id='panel-vma' class='panel'><h2>VMA</h2><div id='vmaList' class='card'>Laddar…</div></section>
-  <section id='panel-nyheter' class='panel'><h2>Nyheter</h2><div id='newsList' class='card'>Laddar…</div></section>
-  <section id='panel-platser' class='panel'><h2>Platser</h2>
-    <div class='card'>
-      <label>Källtyp
-        <select id='gisMode'>
-          <option value='ogc'>OGC API – Features</option>
-          <option value='wfs'>WFS</option>
-          <option value='esri'>ArcGIS Feature Service</option>
-        </select>
-      </label>
-      <label>Bas‑URL <input id='baseUrl' placeholder='OGC/WFS base URL'></label>
-      <label>Samling/Lager <input id='collectionOrType' placeholder='collectionId eller workspace:layer'></label>
-      <label>Esri Feature Layer URL <input id='esriUrl' placeholder='.../FeatureServer/0'></label>
-      <label>Fältnamn <input id='fieldNames' value='name,address'></label>
-      <label>Filter <input id='filterExpr' placeholder='limit=1000;where=1=1;cql=kommun=\'Halmstad\''></label>
-      <div><button class='btn' id='loadGisBtn'>Ladda från GIS</button>
-           <button class='btn-outline' id='clearGisBtn'>Rensa</button></div>
-    </div>
-    <div id='map'></div>
-    <ul id='alarmPoints'></ul>
-  </section>
-</main>
-<script>
-const TABS=document.querySelectorAll('.tab');const PANELS=document.querySelectorAll('.panel');
-TABS.forEach(b=>b.addEventListener('click',()=>{TABS.forEach(x=>x.classList.remove('active'));PANELS.forEach(p=>p.classList.remove('active'));b.classList.add('active');document.getElementById('panel-'+b.dataset.tab).classList.add('active');if(b.dataset.tab==='platser')ensureMap();}));
-let deferredPrompt;const installBtn=document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;installBtn.hidden=false;});
-installBtn.addEventListener('click',async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;installBtn.hidden=true;});
-if('serviceWorker'in navigator){navigator.serviceWorker.register('./service-worker.js').catch(()=>{});} 
-const KRIS_API='https://api.krisinformation.se/v3';const HALLAND=encodeURIComponent('Hallands län');
-function time(s){try{return new Date(s).toLocaleString('sv-SE',{dateStyle:'medium',timeStyle:'short'})}catch{return s}}
-async function loadVMA(){const el=document.getElementById('vmaList');try{const r=await fetch(`${KRIS_API}/vmas?language=sv&counties=${HALLAND}`);const d=await r.json();el.textContent='';if(!d.length){el.textContent='Inga VMA för Halland';return;}d.forEach(i=>{const div=document.createElement('div');div.innerHTML=`<strong>${i.Title||'VMA'}</strong><br>${i.PushMessage||i.Preamble||''}<br><small>${time(i.Sent)||''}</small>`;el.appendChild(div);});}catch{el.textContent='Fel vid hämtning.'}}
-async function loadNews(){const el=document.getElementById('newsList');try{const r=await fetch(`${KRIS_API}/news?language=sv&counties=${HALLAND}&numberOfNewsArticles=10`);const d=await r.json();el.textContent='';if(!d.length){el.textContent='Inga nyheter';return;}d.forEach(i=>{const div=document.createElement('div');div.innerHTML=`<strong>${i.Title||'Nyhet'}</strong><br>${i.Preamble||''}<br><small>${time(i.Published)||''}</small>`;el.appendChild(div);});}catch{el.textContent='Fel vid hämtning.'}}
-loadVMA();loadNews();
-let map,markers;function ensureMap(){if(map)return;map=L.map('map').setView([56.673,12.857],11);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);markers=L.layerGroup().addTo(map);} 
-function gm(addr){return 'https://www.google.com/maps?q='+encodeURIComponent(addr)}
-function renderList(items){const ul=document.getElementById('alarmPoints');ul.innerHTML='';if(!items.length){ul.textContent='Inga punkter att visa.';return;}const b=[];items.forEach(i=>{L.marker(i.latlng).addTo(markers).bindPopup(`<strong>${i.name}</strong><br>${i.address||''}`);const li=document.createElement('li');li.innerHTML=`<strong>${i.name}</strong> — ${i.address||''} — <a href='${gm(i.name+' '+(i.address||''))}' target='_blank'>Öppna i kartapp</a>`;ul.appendChild(li);b.push(i.latlng);});map.fitBounds(b, {padding:[20,20]});}
-function parseExtra(s){if(!s)return{};const out={};s.split(/\s*;\s*|\s*,\s*/).filter(Boolean).forEach(p=>{const[k,v]=p.split('=');if(k&&v)out[k.trim()]=v.trim();});return out;}
-async function loadOGC(base,coll,nameF,addrF,extra){const u=new URL(base.replace(/\/$/,'')+'/collections/'+encodeURIComponent(coll)+'/items');u.searchParams.set('limit',extra.limit||'1000');if(extra.bbox)u.searchParams.set('bbox',extra.bbox);const r=await fetch(u);const gj=await r.json();return (gj.features||[]).filter(f=>f.geometry?.type==='Point').map(f=>({name:f.properties?.[nameF]||f.properties?.namn||'Larmpunkt',address:f.properties?.[addrF]||f.properties?.adress||'',latlng:[f.geometry.coordinates[1],f.geometry.coordinates[0]]}));}
-async function loadWFS(url,typeName,nameF,addrF,extra){const p=new URLSearchParams({service:'WFS',version:'1.1.0',request:'GetFeature',typeName,srsName:'EPSG:4326',outputFormat:'application/json'});if(extra.cql)p.set('CQL_FILTER',extra.cql);const r=await fetch(url+'?'+p.toString());const gj=await r.json();return (gj.features||[]).filter(f=>f.geometry?.type==='Point').map(f=>({name:f.properties?.[nameF]||f.properties?.namn||'Larmpunkt',address:f.properties?.[addrF]||f.properties?.adress||'',latlng:[f.geometry.coordinates[1],f.geometry.coordinates[0]]}));}
-function loadEsri(url,nameF,addrF,where){return new Promise((resolve,reject)=>{try{const lyr=L.esri.featureLayer({url,where:where||'1=1'});const out=[];lyr.once('load',()=>{markers.addLayer(lyr);lyr.eachFeature(l=>{const f=l.feature;out.push({name:f.properties?.[nameF]||'Larmpunkt',address:f.properties?.[addrF]||'',latlng:[l.getLatLng().lat,l.getLatLng().lng]});});resolve(out);});lyr.once('error',e=>reject(e));}catch(e){reject(e);}})}
-async function handleGIS(){ensureMap();markers.clearLayers();document.getElementById('alarmPoints').textContent='Hämtar…';const mode=document.getElementById('gisMode').value;const [nameF,addrF]=(document.getElementById('fieldNames').value||'name,address').split(',');const extra=parseExtra(document.getElementById('filterExpr').value);try{let items=[];if(mode==='ogc'){items=await loadOGC(document.getElementById('baseUrl').value.trim(),document.getElementById('collectionOrType').value.trim(),(nameF||'name').trim(),(addrF||'address').trim(),extra);}else if(mode==='wfs'){items=await loadWFS(document.getElementById('baseUrl').value.trim(),document.getElementById('collectionOrType').value.trim(),(nameF||'name').trim(),(addrF||'address').trim(),extra);}else{items=await loadEsri(document.getElementById('esriUrl').value.trim(),(nameF||'name').trim(),(addrF||'address').trim(),extra.where);}renderList(items);}catch(e){document.getElementById('alarmPoints').textContent='Kunde inte läsa från GIS‑källan.';}}
-
-document.getElementById('loadGisBtn').addEventListener('click',handleGIS);
-document.getElementById('clearGisBtn').addEventListener('click',()=>{document.getElementById('alarmPoints').textContent='Rensat.';markers&&markers.clearLayers();});
-</script>
-</body>
-</html>
+{
+  "name": "Kris Halmstad",
+  "short_name": "Kris Halmstad",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "lang": "sv-SE",
+  "background_color": "#0b1116",
+  "theme_color": "#004a7f",
+  "icons": [
+    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
