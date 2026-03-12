@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="sv">
 <head>
@@ -12,18 +13,10 @@
   <link rel="apple-touch-icon" href="./icons/icon-512.png" />
 
   <!-- Leaflet (karta) -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
-    crossorigin=""
-  />
-  <script
-    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
-    crossorigin=""
-    defer
-  ></script>
+  <link rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script defer
+          src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <style>
     /* Baslayout */
@@ -58,7 +51,6 @@
     .btn-outline { background:transparent; color:#0072ce; }
 
     /* --- Krislägen (inbäddad vy) --- */
-    /* Dold i grundläge; visas som flex ENDAST när aktiv */
     .panel.panel-embed { padding:16px; min-height:calc(100vh - 120px); }
     .panel.panel-embed.active { display:flex; flex-direction:column; gap:12px; }
     .embed-frame {
@@ -84,7 +76,7 @@
 <!-- Header med logga -->
 <header>
   <div class="brand">
-    assets/halmstad-logo.svg
+    <img src="./assets/halmstad-logo.svg" alt="Halmstads kommun" loading="eager" decoding="async" />
     <h1>Kris Halmstad</h1>
   </div>
 </header>
@@ -99,49 +91,55 @@
 </nav>
 
 <!-- PANEL: JUST NU -->
-<div id="panel-justnu" class="panel active">
+<section id="panel-justnu" class="panel active" aria-labelledby="justnu">
   <div class="card">
     <h3>Följ aktuell information</h3>
     <p>Se VMA, nyheter och larmpunkter.</p>
 
     <button class="btn" data-goto="vma">Visa VMA</button>
     <button class="btn-outline" data-goto="nyheter">Visa nyheter</button>
-    <button class="btn-outline" onclick="window.open('./krislagen/index.html','_blank','noopener')">Öppna Krislägen</button>
+    <button class="btn-outline" onclick="window.open('./krislagen/index.html','_blank','noopener')">
+      Öppna Krislägen
+    </button>
   </div>
-</div>
+</section>
 
 <!-- PANEL: VMA -->
-<div id="panel-vma" class="panel">
+<section id="panel-vma" class="panel" aria-labelledby="vma">
   <h2>VMA</h2>
   <div id="vmaList" class="card">Laddar…</div>
-</div>
+</section>
 
 <!-- PANEL: NYHETER -->
-<div id="panel-nyheter" class="panel">
+<section id="panel-nyheter" class="panel" aria-labelledby="nyheter">
   <h2>Nyheter</h2>
   <div id="newsList" class="card">Laddar…</div>
-</div>
+</section>
 
 <!-- PANEL: PLATSER -->
-<div id="panel-platser" class="panel">
+<section id="panel-platser" class="panel" aria-labelledby="platser">
   <h2>Platser</h2>
   <div id="map"></div>
-</div>
+</section>
 
 <!-- PANEL: KRISLÄGEN (inbäddad lokalkopia) -->
-<div id="panel-krislagen" class="panel panel-embed">
+<section id="panel-krislagen" class="panel panel-embed" aria-labelledby="krislagen">
   <h2>Krislägen</h2>
 
-  ./krislagen/index.html</iframe>
+  <iframe class="embed-frame"
+          src="./krislagen/index.html"
+          title="Krislägen – lokal kopia"
+          referrerpolicy="no-referrer-when-downgrade"
+          allow="fullscreen; clipboard-read; clipboard-write"></iframe>
 
   <div class="card" style="margin-top:12px;">
     Om något ser konstigt ut:
-    ./krislagen/index.htmlÖppna Krislägen i hel flik</a>
+    <a class="btn btn-outline" href="./krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
   </div>
-</div>
+</section>
 
 <script>
-  // Kör när DOM är redo – säkrar att event kopplas
+  // Kör när DOM är redo – koppla flikar och ladda data
   document.addEventListener('DOMContentLoaded', () => {
     function showTab(tab){
       document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
@@ -153,11 +151,11 @@
       if (tab === "platser") initMap();
     }
 
-    // Koppla flikknappar
+    // Koppla flik-knappar (i nav)
     document.querySelectorAll("nav button").forEach(btn =>
       btn.addEventListener("click", () => showTab(btn.dataset.tab))
     );
-    // ”Just nu” snabbknappar
+    // Snabbknappar i "Just nu"
     document.querySelectorAll("[data-goto]").forEach(btn =>
       btn.addEventListener("click", () => showTab(btn.dataset.goto))
     );
@@ -167,7 +165,7 @@
     loadNews();
   });
 
-  // PWA – registrera SW när sidan laddats
+  // PWA – registrera SW när sidan laddas
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./service-worker.js").catch(()=>{});
@@ -219,4 +217,3 @@
 
 </body>
 </html>
-``
