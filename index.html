@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="sv">
 <head>
@@ -158,10 +157,17 @@
     });
   }
 
-  // VMA
+  // VMA - with timeout
   async function loadVMA(){
     try{
-      const r = await fetch("https://api.krisinformation.se/v3/vmas?language=sv&counties=" + encodeURIComponent("Hallands län"));
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const r = await fetch("https://api.krisinformation.se/v3/vmas?language=sv&counties=" + encodeURIComponent("Hallands län"), {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
       const d = await r.json();
       const box = document.querySelector("#vmaList");
       box.innerHTML = "";
@@ -172,13 +178,21 @@
     } catch(e){
       const box = document.querySelector("#vmaList");
       if (box) box.textContent = "Kunde inte hämta VMA.";
+      console.error("VMA load error:", e);
     }
   }
 
-  // Nyheter
+  // Nyheter - with timeout
   async function loadNews(){
     try{
-      const r = await fetch("https://api.krisinformation.se/v3/news?language=sv&counties=" + encodeURIComponent("Hallands län"));
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+      
+      const r = await fetch("https://api.krisinformation.se/v3/news?language=sv&counties=" + encodeURIComponent("Hallands län"), {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+      
       const d = await r.json();
       const box = document.querySelector("#newsList");
       box.innerHTML = "";
@@ -189,6 +203,7 @@
     } catch(e){
       const box = document.querySelector("#newsList");
       if (box) box.textContent = "Kunde inte hämta nyheter.";
+      console.error("News load error:", e);
     }
   }
 
