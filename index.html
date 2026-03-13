@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="sv">
 <head>
@@ -25,7 +24,7 @@
     crossorigin=""
   ></script>
 
-  <!-- Esri Leaflet (valfritt, behövs endast om du använder ArcGIS Feature Service) -->
+  <!-- Esri Leaflet (behövs bara om du använder ArcGIS Feature Service) -->
   <script src="https://unpkg.com/esri-leaflet@3/dist/esri-leaflet.js"></script>
 
   <style>
@@ -33,9 +32,9 @@
       --brand:#004a7f; --brand-2:#0072ce; --bg:#0b1116; --card:#121a22; --border:#223042;
       --text:#e7eef6; --muted:#a6b7c8; --accent:#14b8a6; --error:#ff6b6b;
 
-      /* Watermark från kod 1 */
-      --watermark-opacity: 0.06;          /* 0.04–0.10 lagom */
-      --watermark-size: min(60vw, 800px); /* loggans storlek */
+      /* Watermark */
+      --watermark-opacity: 0.06;
+      --watermark-size: min(60vw, 800px);
     }
     * { box-sizing: border-box }
     html, body {
@@ -63,7 +62,7 @@
     h1 { margin:0; font-size:18px }
     .subtitle{margin:0; font-size:12px; color:var(--muted)}
     .tabs { display:grid; grid-auto-flow:column; gap:4px; padding:8px; background:#0d1520; position:sticky; top:60px; z-index:4;}
-    .tab { padding:10px 12px; border:1px solid var(--border); background:transparent; color:var(--text); border-radius:10px; cursor:pointer; }
+    .tab { padding:10px 12px; border:1px solid var(--border); background:transparent; color:var(--text); border-radius:10px; cursor:pointer; display:inline-flex; align-items:center; }
     .tab.active { border-color:var(--brand-2); background:#101c29; }
 
     main { padding:16px; position:relative; z-index:1; }
@@ -74,7 +73,7 @@
     .card h3{margin:0 0 6px 0; font-size:16px} .card p{margin:0 0 6px 0; line-height:1.45}
     .card.highlight{ border-color:var(--accent) }
     .meta{ color:var(--muted); font-size:12px; margin-top:2px }
-    .actions{ display:flex; gap:8px; align-items:center; margin-top:8px }
+    .actions{ display:flex; gap:8px; align-items:center; margin-top:8px; flex-wrap:wrap; }
     .source{ color:var(--muted); font-size:12px; margin-left:auto }
     .btn,.btn-outline{ padding:8px 12px; border-radius:10px; font-weight:600; cursor:pointer; border:1px solid var(--brand-2)}
     .btn{ background:var(--brand-2); color:#fff } .btn-outline{ background:transparent; color:var(--brand-2)}
@@ -90,7 +89,7 @@
     .form-row{ display:grid; gap:8px; grid-template-columns: 1fr 2fr; align-items:center; margin:6px 0 }
     .form-row input, .form-row select{ width:100%; background:#0e1620; border:1px solid var(--border); color:var(--text); border-radius:8px; padding:8px }
 
-    /* Krislägen (inbäddad) – från kod 1, anpassad till denna layout */
+    /* Krislägen (inbäddad) */
     .panel.panel-embed { min-height:calc(100vh - 160px); }
     .panel.panel-embed.active {
       display:flex;
@@ -101,6 +100,48 @@
       flex:1 1 auto; width:100%; height:70vh; min-height:600px;
       border:0; border-radius:12px; background:#0d1520; overflow:auto;
     }
+
+    /* === KRISLÅDA: stilar för checklistan === */
+    .category-header {
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      margin-bottom:6px;
+    }
+    .category-title { margin:0; font-size:16px; }
+    .category-tools { display:flex; gap:8px; align-items:center; }
+    .checklist {
+      list-style:none; padding-left:0; display:grid; gap:8px; margin:0;
+    }
+    .checklist li {
+      display:flex; align-items:flex-start; gap:8px; padding:8px;
+      background:#0e1620; border:1px solid var(--border); border-radius:10px;
+    }
+    .checklist label { cursor:pointer; display:block; }
+    .badge {
+      display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px;
+      background:#0d1520; border:1px solid var(--border); color:var(--muted);
+    }
+
+    /* Krislåda – räknare på fliken */
+    .tab .tab-count{
+      display:inline-flex; align-items:center; justify-content:center;
+      min-width:22px; padding:0 6px; margin-left:6px;
+      height:18px; border-radius:999px; font-size:12px; line-height:18px;
+      background:#101c29; color:var(--brand-2); border:1px solid var(--brand-2);
+    }
+
+    /* JUST NU – liten röd dot + VMA-banners */
+    .dot {
+      display:inline-block; width:8px; height:8px; border-radius:50%;
+      background:#ff4d4f; margin-left:8px; vertical-align:middle;
+      box-shadow: 0 0 0 2px #0d1520;
+    }
+    .banner.card {
+      border-color:#ffcc66;
+      background:linear-gradient(180deg, #1a1410, #151114);
+    }
+    .banner.card h3 { display:flex; align-items:center; gap:8px; }
+    .banner.card h3::before { content:"⚠️"; }
+    /* === /KRISLÅDA === */
   </style>
 </head>
 <body>
@@ -121,14 +162,19 @@
     <button class="tab" data-tab="nyheter" role="tab" aria-selected="false">Nyheter</button>
     <button class="tab" data-tab="platser" role="tab" aria-selected="false">Platser</button>
     <button class="tab" data-tab="krislagen" role="tab" aria-selected="false">Krislägen</button>
+    <button class="tab" data-tab="krislada" role="tab" aria-selected="false">Krislåda</button>
     <button class="tab" data-tab="om" role="tab" aria-selected="false">Om</button>
   </nav>
 
   <main>
     <!-- JUST NU -->
     <section id="panel-justnu" class="panel active" aria-labelledby="justnu">
-      <h2>Just nu</h2>
-      <div id="rightNow" class="cards">
+      <h2>Just nu <span id="justNowDot" class="dot" hidden></span></h2>
+
+      <!-- VMA-banners (sammanfattning + per VMA) injiceras här -->
+      <div id="rightNow" class="cards"></div>
+
+      <div class="cards" style="margin-top:12px;">
         <div class="card highlight">
           <h3>Följ aktuell information</h3>
           <p>Installera appen för snabb åtkomst. VMA och nyheter hämtas från Krisinformation.se.</p>
@@ -224,7 +270,7 @@
       </details>
     </section>
 
-    <!-- KRISLÄGEN (inbäddad vy från kod 1) -->
+    <!-- KRISLÄGEN (inbäddad) -->
     <section id="panel-krislagen" class="panel panel-embed" aria-labelledby="krislagen">
       <h2>Krislägen</h2>
       <iframe
@@ -236,7 +282,39 @@
       ></iframe>
 
       <div class="card" style="margin-top:12px;">
-        Om något ser konstigt ut: <a class="btn btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
+        Om något ser konstigt ut:
+        <a class="btn btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
+      </div>
+    </section>
+
+    <!-- KRISLÅDA -->
+    <section id="panel-krislada" class="panel" aria-labelledby="krislada">
+      <h2>Krislåda</h2>
+
+      <div class="card">
+        <h3>Checklista för hemberedskap</h3>
+        <p class="muted">Markera det du redan har. Status sparas i denna webbläsare.</p>
+
+        <div class="actions">
+          <button class="btn btn-outline" id="checkAllBtn">Markera allt</button>
+          <button class="btn btn-outline" id="uncheckAllBtn">Avmarkera allt</button>
+          <button class="btn btn-outline" id="resetToDefaultBtn" title="Återställ till standardinnehåll">Återställ</button>
+
+          <span class="source" id="krisladaSummary">0/0 klara</span>
+        </div>
+      </div>
+
+      <!-- Kategorier + checkboxar renderas dynamiskt hit -->
+      <div id="krisladaContainer" class="cards"></div>
+
+      <div class="card">
+        <h3>Export/Import</h3>
+        <p class="muted">Exportera din lista (inkl. status) som JSON eller importera en egen lista.</p>
+        <div class="actions">
+          <button class="btn" id="exportBtn">Exportera JSON</button>
+          <label class="btn btn-outline" for="importFile" style="cursor:pointer;">Importera JSON</label>
+          <input type="file" id="importFile" accept="application/json" hidden />
+        </div>
       </div>
     </section>
 
@@ -260,6 +338,7 @@
     // ---------- Tabs ----------
     const TABS = document.querySelectorAll('.tab');
     const PANELS = document.querySelectorAll('.panel');
+
     function selectTab(id) {
       TABS.forEach(b => {
         const active = b.dataset.tab === id;
@@ -268,6 +347,13 @@
       });
       PANELS.forEach(p => p.classList.toggle('active', p.id === `panel-${id}`));
       if (id === 'platser') ensureMap();
+
+      // Initiera Krislåda första gången fliken öppnas
+      if (id === 'krislada' && !window.__krisladaInitialized) {
+        bindKrisladaTopButtons();
+        renderKrislada();
+        window.__krisladaInitialized = true;
+      }
     }
     TABS.forEach(btn => btn.addEventListener('click', () => selectTab(btn.dataset.tab)));
 
@@ -305,10 +391,88 @@
       catch { return s; }
     }
 
+    // Säker HTML-escape (återanvänds)
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, m => (
+        { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m]
+      ));
+    }
+
     function linkCard(title, body, url, meta='') {
       const a = url ? `<a class="btn btn-outline" href="${url}" target="_blank" rel="noopener">Läs mer</a>` : '';
-      const m = meta ? `<div class="meta">${meta}</div>` : '';
-      return `<article class="card"><h3>${title}</h3><p>${body||''}</p>${m}<div class="actions">${a}<span class="source">Källa: Krisinformation.se</span></div></article>`;
+      const m = meta ? `<div class="meta">${escapeHtml(meta)}</div>` : '';
+      return `<article class="card"><h3>${escapeHtml(title)}</h3><p>${escapeHtml(body||'')}</p>${m}<div class="actions">${a}<span class="source">Källa: Krisinformation.se</span></div></article>`;
+    }
+
+    // JUST NU – röd dot + VMA-banners-område
+    function ensureJustNowDot(){
+      const dot = document.getElementById('justNowDot');
+      return dot || null;
+    }
+    function setJustNowDot(active){
+      const dot = ensureJustNowDot();
+      if (dot) dot.hidden = !active;
+    }
+    function ensureJustNowBannerArea(){
+      let area = document.getElementById('justNowBanners');
+      if (!area) {
+        const rightNow = document.getElementById('rightNow');
+        if (!rightNow) return null;
+        area = document.createElement('div');
+        area.id = 'justNowBanners';
+        area.className = 'cards';
+        rightNow.prepend(area);
+      }
+      return area;
+    }
+    function renderVmaBanners(vmas){
+      const area = ensureJustNowBannerArea();
+      if (!area) return;
+      area.innerHTML = '';
+
+      if (!Array.isArray(vmas) || !vmas.length) {
+        setJustNowDot(false);
+        return;
+      }
+
+      // Sammanfattningsbanner (C)
+      const count = vmas.length;
+      const summary = document.createElement('article');
+      summary.className = 'card banner';
+      summary.innerHTML = `
+        <h3>${count} aktiv${count>1?'a':''} VMA i Halland</h3>
+        <p class="muted">Se detaljer nedan eller öppna VMA‑fliken.</p>
+        <div class="actions">
+          <button class="btn" onclick="document.querySelector('[data-tab=\\'vma\\']').click()">Visa alla i VMA</button>
+        </div>
+      `;
+      area.appendChild(summary);
+
+      // En banner per VMA (B)
+      vmas.forEach(item => {
+        const title = item.Title || item.Headline || 'VMA';
+        const desc  = item.PushMessage || item.Preamble || item.BodyText || '';
+        const link  = item.Web || item.Link || '';
+        const meta  = [
+          item.Sent && `Publicerad ${formatDate(item.Sent)}`,
+          Array.isArray(item.Counties) && item.Counties.join(', ')
+        ].filter(Boolean).join(' • ');
+
+        const card = document.createElement('article');
+        card.className = 'card banner';
+        card.innerHTML = `
+          <h3>${escapeHtml(title)}</h3>
+          ${desc ? `<p>${escapeHtml(desc)}</p>` : ''}
+          ${meta ? `<div class="meta">${escapeHtml(meta)}</div>` : ''}
+          <div class="actions">
+            ${link ? `<a class="btn btn-outline" href="${link}" target="_blank" rel="noopener">Läs mer</a>` : ''}
+            <button class="btn" onclick="document.querySelector('[data-tab=\\'vma\\']').click()">Öppna VMA‑fliken</button>
+          </div>
+        `;
+        area.appendChild(card);
+      });
+
+      setJustNowDot(true);
     }
 
     async function loadVMA() {
@@ -317,20 +481,31 @@
         const res = await fetch(`${KRIS_API}/vmas?language=sv&counties=${HALLAND}`, { headers: { accept:'application/json' }});
         if (!res.ok) throw new Error(res.statusText);
         const data = await res.json();
+
         if (!Array.isArray(data) || !data.length) {
           vmaList.innerHTML = `<div class="card"><h3>Inga aktiva VMA för Halland</h3><p class="muted">Kontrollera senare.</p></div>`;
+          renderVmaBanners([]);
           return;
         }
+
         vmaList.innerHTML = data.map(item => {
           const title = item.Title || item.Headline || 'VMA';
           const desc  = item.PushMessage || item.Preamble || item.BodyText || '';
           const link  = item.Web || item.Link || '';
-          const meta  = [item.Sent && `Publicerad ${formatDate(item.Sent)}`, Array.isArray(item.Counties)&&item.Counties.join(', ')].filter(Boolean).join(' • ');
+          const meta  = [
+            item.Sent && `Publicerad ${formatDate(item.Sent)}`,
+            Array.isArray(item.Counties) && item.Counties.join(', ')
+          ].filter(Boolean).join(' • ');
           return linkCard(title, desc, link, meta);
         }).join('');
+
+        // Banners i "Just nu"
+        renderVmaBanners(data);
+
       } catch (e) {
         console.error(e);
         vmaList.innerHTML = `<div class="card"><h3>Fel</h3><p class="error">Kunde inte hämta VMA.</p></div>`;
+        renderVmaBanners([]);
       }
     }
 
@@ -549,6 +724,280 @@
         document.getElementById('filterExpr').value = cfg.filterExpr || '';
       }catch{}
     })();
+
+    /* ============================
+       === KRISLÅDA: Data & logik ===
+       ============================ */
+
+    const KRISLADA_STORE_KEY = 'kris-halmstad-krislada';
+
+    // 7-dagars hemberedskap enligt MSB + scenarier (Extremvärme borttagen) + lokal placeholder
+    const KRISLADA_DEFAULT = [
+      { category: 'Vatten', items: [
+        { text: 'Dricksvatten för minst 7 dagar (3–5 liter/person/dag)', done: false },
+        { text: 'Rena vattenbehållare/dunkar (livsmedelsgodkända, lock)', done: false },
+        { text: 'Vattenrening (filter/tabletter/kokmöjlighet)', done: false },
+        { text: 'Livsmedelssäkra flaskor för rotation (märk datum)', done: false }
+      ]},
+      { category: 'Mat', items: [
+        { text: 'Konserver (soppor, bönor, fisk, grytor)', done: false },
+        { text: 'Torrvaror (pasta, ris, gryn, knäckebröd)', done: false },
+        { text: 'Nötter, torkad frukt, energibars', done: false },
+        { text: 'Barnmat/specialkost (vid behov), husdjur: foder', done: false },
+        { text: 'Manuell konservöppnare', done: false }
+      ]},
+      { category: 'Matlagning & Värme', items: [
+        { text: 'Stormkök/gasolkök + bränsle (ventilera säkert)', done: false },
+        { text: 'Tändstickor/tändare (vattenskyddade)', done: false },
+        { text: 'Kastrull, stekpanna, värmetåliga underlägg', done: false },
+        { text: 'Värmeljus/stearinljus + hållare (brandsäkert avstånd)', done: false },
+        { text: 'Filtrar och varma kläder (lager‑på‑lager)', done: false }
+      ]},
+      { category: 'Belysning & Energi', items: [
+        { text: 'Ficklampa/pannlampa till alla i hushållet', done: false },
+        { text: 'Batterier i rätt storlek (rotationssystem)', done: false },
+        { text: 'Powerbank(ar) + kablar (håll laddade)', done: false },
+        { text: 'Solpanel liten/vevladdare (valfritt komplement)', done: false }
+      ]},
+      { category: 'Kommunikation & Information', items: [
+        { text: 'Batteri‑ eller vevradio för VMA/krisinformation', done: false },
+        { text: 'Viktiga nummer utskrivna (SOS 112, 113 13, 1177)', done: false },
+        { text: 'Kontaktlista till grannar/anhöriga (utskriven)', done: false },
+        { text: 'Laddad mobil + ev. kontantkort/reservtelefon', done: false }
+      ]},
+      { category: 'Sjukvård & Hygien', items: [
+        { text: 'Första hjälpen‑kit (plåster, sårvård, förband)', done: false },
+        { text: 'Personliga läkemedel för minst 7 dagar', done: false },
+        { text: 'Smärtstillande/febernedsättande (enligt behov)', done: false },
+        { text: 'Hygien: tvål, våtservetter, toalettpapper', done: false },
+        { text: 'Soppåsar/torrtoalettlösning (vid längre avbrott)', done: false }
+      ]},
+      { category: 'Dokument & Betalning', items: [
+        { text: 'ID‑handlingar/kopior (förvarat vattenskyddat)', done: false },
+        { text: 'Kontanter i små valörer', done: false },
+        { text: 'Viktiga avtal/policys/nummer (utskrivet & digitalt)', done: false }
+      ]},
+      { category: 'Verktyg & Övrigt', items: [
+        { text: 'Multiverktyg/kniv, silvertejp/snöre/buntband', done: false },
+        { text: 'Fickkniv/sax, arbetshandskar, fickvärmare', done: false },
+        { text: 'Ficklampa extra, reflekterande väst', done: false }
+      ]},
+      { category: 'Scenarier: Långvarigt elavbrott', items: [
+        { text: 'Samla hushållet i ett rum, täta drag, använd filtar', done: false },
+        { text: 'Spara batteri: stäng av onödiga enheter', done: false },
+        { text: 'Mat: ät färskvaror först, planera måltider', done: false },
+        { text: 'Ventilation vid öppen låga/stormkök – brandsäkerhet', done: false }
+      ]},
+      { category: 'Scenarier: Ingen mobiltelefoni/internet', items: [
+        { text: 'Använd utskrivna kontaktlistor & uppsamlingsplats', done: false },
+        { text: 'Följ vev-/batteriradio för VMA och lägesbild', done: false },
+        { text: 'Överenskomna tider för fysiska avstämningar', done: false }
+      ]},
+      { category: 'Lokala resurser (Halmstad)', items: [
+        { text: 'Trygghetspunkter (öppnas vid behov) – se kommunens info', done: false },
+        { text: 'Vattenutlämning – plats och tider (vid behov)', done: false },
+        { text: 'Lokal information: www.halmstad.se/kris (uppdaterad länk)', done: false }
+      ]}
+    ];
+
+    function loadKrislada() {
+      try {
+        const raw = localStorage.getItem(KRISLADA_STORE_KEY);
+        if (!raw) return structuredClone(KRISLADA_DEFAULT);
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return structuredClone(KRISLADA_DEFAULT);
+        return parsed;
+      } catch {
+        return structuredClone(KRISLADA_DEFAULT);
+      }
+    }
+
+    function saveKrislada(state) {
+      localStorage.setItem(KRISLADA_STORE_KEY, JSON.stringify(state));
+    }
+
+    function summarize(state) {
+      let total = 0, done = 0;
+      state.forEach(cat => cat.items.forEach(it => { total += 1; if (it.done) done += 1; }));
+      return { total, done };
+    }
+
+    // === Emoji per kategori + flik-räknare ===
+    const KRISLADA_EMOJI_RULES = [
+      { test: n => n === 'Vatten',                        emoji: '💧' },
+      { test: n => n === 'Mat',                           emoji: '🍲' },
+      { test: n => n.startsWith('Matlagning'),            emoji: '🍳' },
+      { test: n => n === 'Belysning & Energi',            emoji: '🔦' },
+      { test: n => n.startsWith('Kommunikation'),         emoji: '📻' },
+      { test: n => n === 'Sjukvård & Hygien',             emoji: '🩹' },
+      { test: n => n.startsWith('Dokument'),              emoji: '🪪' },
+      { test: n => n.startsWith('Verktyg'),               emoji: '🧰' },
+      { test: n => n.includes('Elavbrott'),               emoji: '⚡️' },
+      { test: n => n.includes('Ingen mobil'),             emoji: '📵' },
+      { test: n => n.startsWith('Lokala resurser'),       emoji: '📍' },
+    ];
+    function emojiForCategory(name){
+      const n = String(name || '');
+      const rule = KRISLADA_EMOJI_RULES.find(r => r.test(n));
+      return rule ? rule.emoji : '🎒';
+    }
+
+    function ensureKrisladaTabShell(){
+      const btn = document.querySelector('.tab[data-tab="krislada"]');
+      if (!btn) return { btn:null, countEl:null };
+      let label = btn.querySelector('.tab-label');
+      let count = btn.querySelector('.tab-count');
+      if (!label || !count){
+        btn.innerHTML = `<span class="tab-label">🎒 Krislåda</span><span class="tab-count">0/0</span>`;
+        label = btn.querySelector('.tab-label');
+        count = btn.querySelector('.tab-count');
+      }
+      return { btn, countEl: count };
+    }
+    function updateKrisladaTabCounter(done, total){
+      const { countEl } = ensureKrisladaTabShell();
+      if (countEl) countEl.textContent = `${done}/${total}`;
+    }
+
+    let krisladaState = loadKrislada();
+    {
+      const { total, done } = summarize(krisladaState);
+      updateKrisladaTabCounter(done, total);
+    }
+
+    function renderKrislada() {
+      const wrap = document.getElementById('krisladaContainer');
+      if (!wrap) return;
+
+      wrap.innerHTML = krisladaState.map((cat, cIdx) => {
+        const doneCount = cat.items.filter(i => i.done).length;
+        const total = cat.items.length;
+
+        const itemsHtml = cat.items.map((it, iIdx) => {
+          const id = `item-${cIdx}-${iIdx}`;
+          return `
+            <li>
+              <input type="checkbox" id="${id}" data-cindex="${cIdx}" data-iindex="${iIdx}" ${it.done ? 'checked' : ''} />
+              <label for="${id}">${escapeHtml(it.text)}</label>
+            </li>
+          `;
+        }).join('');
+
+        return `
+          <article class="card">
+            <div class="category-header">
+              <h3 class="category-title">${emojiForCategory(cat.category)} ${escapeHtml(cat.category)}</h3>
+              <div class="category-tools">
+                <span class="badge" title="Klart i kategori">${doneCount}/${total}</span>
+                <button class="btn btn-outline" data-cat="${cIdx}" data-action="check-all">Markera alla</button>
+                <button class="btn btn-outline" data-cat="${cIdx}" data-action="uncheck-all">Avmarkera alla</button>
+              </div>
+            </div>
+            <ul class="checklist">
+              ${itemsHtml}
+            </ul>
+          </article>
+        `;
+      }).join('');
+
+      // Checkbox-händelser
+      wrap.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          const c = +e.target.dataset.cindex;
+          const i = +e.target.dataset.iindex;
+          krisladaState[c].items[i].done = e.target.checked;
+          saveKrislada(krisladaState);
+
+          // Uppdatera sammanfattning + flik-räknare
+          const sumEl = document.getElementById('krisladaSummary');
+          if (sumEl) {
+            const { total, done } = summarize(krisladaState);
+            sumEl.textContent = `${done}/${total} klara`;
+            updateKrisladaTabCounter(done, total);
+          }
+
+          // Re-render för att uppdatera per-kategori-badge
+          renderKrislada();
+        });
+      });
+
+      // Kategori-knappar
+      wrap.querySelectorAll('button[data-action]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const c = +btn.dataset.cat;
+          const action = btn.dataset.action;
+          krisladaState[c].items.forEach(it => it.done = (action === 'check-all'));
+          saveKrislada(krisladaState);
+          renderKrislada();
+        });
+      });
+
+      // Total-sammanfattning
+      const sumEl = document.getElementById('krisladaSummary');
+      if (sumEl) {
+        const { total, done } = summarize(krisladaState);
+        sumEl.textContent = `${done}/${total} klara`;
+        updateKrisladaTabCounter(done, total);
+      }
+    }
+
+    function bindKrisladaTopButtons() {
+      const checkAllBtn = document.getElementById('checkAllBtn');
+      const uncheckAllBtn = document.getElementById('uncheckAllBtn');
+      const resetBtn = document.getElementById('resetToDefaultBtn');
+      const exportBtn = document.getElementById('exportBtn');
+      const importFile = document.getElementById('importFile');
+
+      checkAllBtn?.addEventListener('click', () => {
+        krisladaState.forEach(cat => cat.items.forEach(it => it.done = true));
+        saveKrislada(krisladaState);
+        renderKrislada();
+      });
+
+      uncheckAllBtn?.addEventListener('click', () => {
+        krisladaState.forEach(cat => cat.items.forEach(it => it.done = false));
+        saveKrislada(krisladaState);
+        renderKrislada();
+      });
+
+      resetBtn?.addEventListener('click', () => {
+        if (!confirm('Återställa Krislåda till standardinnehåll? Detta ersätter din nuvarande lista.')) return;
+        krisladaState = structuredClone(KRISLADA_DEFAULT);
+        saveKrislada(krisladaState);
+        renderKrislada();
+      });
+
+      exportBtn?.addEventListener('click', () => {
+        const blob = new Blob([JSON.stringify(krisladaState, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = 'krislada.json'; a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      importFile?.addEventListener('change', async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          if (!Array.isArray(data)) throw new Error('Felaktigt format');
+          data.forEach(cat => {
+            if (typeof cat.category !== 'string' || !Array.isArray(cat.items)) throw new Error('Felaktig kategori');
+            cat.items.forEach(it => {
+              if (typeof it.text !== 'string') throw new Error('Felaktig post');
+              if (typeof it.done !== 'boolean') it.done = !!it.done;
+            });
+          });
+          krisladaState = data;
+          saveKrislada(krisladaState);
+          renderKrislada();
+          e.target.value = '';
+        } catch (err) {
+          alert('Kunde inte importera JSON: ' + (err?.message || err));
+        }
+      });
+    }
   </script>
 </body>
 </html>
