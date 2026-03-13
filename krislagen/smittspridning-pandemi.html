@@ -1,24 +1,23 @@
+
 <!doctype html>
 <html lang="sv">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Smittspridning / Pandemi – Krislägen</title>
-  <link rel="stylesheet" href="./styles.css"/>
-  <script defer src="./app.js"></script>
+  ./styles.css
+  ./app.jsscript>
 </head>
 <body>
-
 <header>
   <div class="title">
-    <a class="back" href="./index.html">← Alla krislägen</a>
+    ./index.html← Alla krislägen</a>
     <h1>🦠 Smittspridning / Pandemi</h1>
   </div>
 </header>
 
 <main>
 
-  <!-- Så vet du att det gäller -->
   <section class="section">
     <h3>Så vet du att det gäller</h3>
     <ul>
@@ -29,28 +28,27 @@
     <div class="source">Källa: Kommunens och myndigheters publika råd.</div>
   </section>
 
-  <!-- Det här gör du direkt -->
   <section class="section warn">
     <h3>Det här gör du direkt</h3>
     <ul>
       <li>Säkra liv/egendom, ring 112 vid akut fara.</li>
-      <li>Följ information från Krisinformation.se och lokal kanal.</li>
-      <li>Hjälp närstående enligt din plan.</li>
+      <li>Följ råd och rekommendationer från Folkhälsomyndigheten och Halmstads kommun.</li>
+      <li>Stanna hemma vid symtom och undvik nära kontakt med riskgrupper.</li>
+      <li>Hjälp närstående enligt er familjeplan.</li>
     </ul>
-    <div class="source">Källa: Generella krisråd (anpassa lokalt).</div>
+    <div class="source">Källa: MSB:s generella krisråd, FHM-riktlinjer.</div>
   </section>
 
-  <!-- Det här gör kommunen -->
   <section class="section">
     <h3>Det här gör kommunen</h3>
     <ul>
-      <li>Aktiverar krisledning och informationskanaler.</li>
-      <li>Samverkar med räddningstjänst, polis, region, trafik.</li>
+      <li>Aktiverar krisledning och säkerställer samhällsviktig verksamhet.</li>
+      <li>Samverkar med region, vårdgivare, myndigheter och skolor.</li>
+      <li>Ger löpande information via webb, sociala medier och kontaktcenter.</li>
       <li>Öppnar trygghetspunkter vid behov.</li>
     </ul>
   </section>
 
-  <!-- Förberedelser -->
   <section class="section">
     <h3>Förberedelser</h3>
 
@@ -59,7 +57,6 @@
       <button class="tab" data-tab="efter">Efter krisen</button>
     </div>
 
-    <!-- Före krisen -->
     <div id="fore" class="tab-panel" style="display:none">
       <ul class="checklist">
         <li><input type="checkbox"/> Ha hemberedskap för minst en vecka.</li>
@@ -69,7 +66,6 @@
       </ul>
     </div>
 
-    <!-- Efter krisen -->
     <div id="efter" class="tab-panel" style="display:none">
       <ul class="checklist">
         <li><input type="checkbox"/> Vänta på klartecken från myndigheter.</li>
@@ -83,11 +79,9 @@
         setupChecklist('pandemi');
       });
     </script>
-
   </section>
 
   <div class="footer-space"></div>
-
 </main>
 </body>
 </html>
