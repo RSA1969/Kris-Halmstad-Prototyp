@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="sv">
 <head>
@@ -24,39 +25,31 @@
     crossorigin=""
   ></script>
 
-  <!-- Esri Leaflet (behövs bara om du använder ArcGIS Feature Service) -->
+  <!-- Esri Leaflet (valfritt) -->
   <script src="https://unpkg.com/esri-leaflet@3/dist/esri-leaflet.js"></script>
+
+  <!-- ExcelJS + FileSaver för Excel-export -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
   <style>
     :root {
       --brand:#004a7f; --brand-2:#0072ce; --bg:#0b1116; --card:#121a22; --border:#223042;
       --text:#e7eef6; --muted:#a6b7c8; --accent:#14b8a6; --error:#ff6b6b;
-
-      /* Watermark */
-      --watermark-opacity: 0.06;
-      --watermark-size: min(60vw, 800px);
+      --watermark-opacity: 0.06; --watermark-size: min(60vw, 800px);
     }
     * { box-sizing: border-box }
-    html, body {
-      margin:0; padding:0; background:var(--bg); color:var(--text);
-      font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans";
-    }
-
+    html, body { margin:0; padding:0; background:var(--bg); color:var(--text);
+      font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans"; }
     /* Watermark-bakgrund med Halmstads logga */
-    body::before{
-      content:"";
-      position:fixed; inset:0; z-index:0;
+    body::before{ content:""; position:fixed; inset:0; z-index:0;
       background:
         radial-gradient(transparent 0, transparent 30%, rgba(0,0,0,0.08) 100%) center/200% 200% no-repeat,
         url("assets/halmstad-logo.svg") center/var(--watermark-size) no-repeat;
-      opacity:var(--watermark-opacity);
-      pointer-events:none;
-    }
+      opacity:var(--watermark-opacity); pointer-events:none; }
 
-    .app-header {
-      display:flex; align-items:center; justify-content:space-between;
-      padding:12px 16px; border-bottom:1px solid var(--border); background:#0d1520; position:sticky; top:0; z-index:5;
-    }
+    .app-header { display:flex; align-items:center; justify-content:space-between;
+      padding:12px 16px; border-bottom:1px solid var(--border); background:#0d1520; position:sticky; top:0; z-index:5; }
     .brand { display:flex; align-items:center; gap:12px; }
     .brand img.logo { height:32px; width:auto; display:block; }
     h1 { margin:0; font-size:18px }
@@ -91,57 +84,23 @@
 
     /* Krislägen (inbäddad) */
     .panel.panel-embed { min-height:calc(100vh - 160px); }
-    .panel.panel-embed.active {
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-    .embed-frame {
-      flex:1 1 auto; width:100%; height:70vh; min-height:600px;
-      border:0; border-radius:12px; background:#0d1520; overflow:auto;
-    }
+    .panel.panel-embed.active { display:flex; flex-direction:column; gap:12px; }
+    .embed-frame { flex:1 1 auto; width:100%; height:70vh; min-height:600px; border:0; border-radius:12px; background:#0d1520; overflow:auto; }
 
-    /* === KRISLÅDA: stilar för checklistan === */
-    .category-header {
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      margin-bottom:6px;
-    }
+    /* Krislåda – stilar */
+    .category-header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:6px; }
     .category-title { margin:0; font-size:16px; }
     .category-tools { display:flex; gap:8px; align-items:center; }
-    .checklist {
-      list-style:none; padding-left:0; display:grid; gap:8px; margin:0;
-    }
-    .checklist li {
-      display:flex; align-items:flex-start; gap:8px; padding:8px;
-      background:#0e1620; border:1px solid var(--border); border-radius:10px;
-    }
+    .checklist { list-style:none; padding-left:0; display:grid; gap:8px; margin:0; }
+    .checklist li { display:flex; align-items:flex-start; gap:8px; padding:8px; background:#0e1620; border:1px solid var(--border); border-radius:10px; }
     .checklist label { cursor:pointer; display:block; }
-    .badge {
-      display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px;
-      background:#0d1520; border:1px solid var(--border); color:var(--muted);
-    }
-
-    /* Krislåda – räknare på fliken */
-    .tab .tab-count{
-      display:inline-flex; align-items:center; justify-content:center;
-      min-width:22px; padding:0 6px; margin-left:6px;
-      height:18px; border-radius:999px; font-size:12px; line-height:18px;
-      background:#101c29; color:var(--brand-2); border:1px solid var(--brand-2);
-    }
+    .badge { display:inline-block; padding:2px 8px; border-radius:999px; font-size:12px; background:#0d1520; border:1px solid var(--border); color:var(--muted); }
 
     /* JUST NU – liten röd dot + VMA-banners */
-    .dot {
-      display:inline-block; width:8px; height:8px; border-radius:50%;
-      background:#ff4d4f; margin-left:8px; vertical-align:middle;
-      box-shadow: 0 0 0 2px #0d1520;
-    }
-    .banner.card {
-      border-color:#ffcc66;
-      background:linear-gradient(180deg, #1a1410, #151114);
-    }
+    .dot { display:inline-block; width:8px; height:8px; border-radius:50%; background:#ff4d4f; margin-left:8px; vertical-align:middle; box-shadow: 0 0 0 2px #0d1520; }
+    .banner.card { border-color:#ffcc66; background:linear-gradient(180deg, #1a1410, #151114); }
     .banner.card h3 { display:flex; align-items:center; gap:8px; }
     .banner.card h3::before { content:"⚠️"; }
-    /* === /KRISLÅDA === */
   </style>
 </head>
 <body>
@@ -170,10 +129,7 @@
     <!-- JUST NU -->
     <section id="panel-justnu" class="panel active" aria-labelledby="justnu">
       <h2>Just nu <span id="justNowDot" class="dot" hidden></span></h2>
-
-      <!-- VMA-banners (sammanfattning + per VMA) injiceras här -->
       <div id="rightNow" class="cards"></div>
-
       <div class="cards" style="margin-top:12px;">
         <div class="card highlight">
           <h3>Följ aktuell information</h3>
@@ -190,30 +146,22 @@
     <!-- VMA -->
     <section id="panel-vma" class="panel" aria-labelledby="vma">
       <h2>Viktigt meddelande till allmänheten (VMA)</h2>
-      <div id="vmaList" class="cards">
-        <div class="muted">Laddar VMA…</div>
-      </div>
+      <div id="vmaList" class="cards"><div class="muted">Laddar VMA…</div></div>
     </section>
 
     <!-- NYHETER -->
     <section id="panel-nyheter" class="panel" aria-labelledby="nyheter">
       <h2>Nyheter</h2>
-      <div id="newsList" class="cards">
-        <div class="muted">Laddar nyheter…</div>
-      </div>
+      <div id="newsList" class="cards"><div class="muted">Laddar nyheter…</div></div>
     </section>
 
     <!-- PLATSER -->
     <section id="panel-platser" class="panel" aria-labelledby="platser">
       <h2>Platser</h2>
-
       <details open>
         <summary>Larmpunkter (om 112 inte fungerar)</summary>
-
-        <!-- Konfig-ruta – koppla GIS-källa direkt -->
         <div class="card">
           <h3>Koppla GIS-källa</h3>
-
           <div class="form-row">
             <label for="gisMode">Källtyp</label>
             <select id="gisMode">
@@ -222,99 +170,90 @@
               <option value="esri">ArcGIS Feature Service</option>
             </select>
           </div>
-
           <div class="form-row">
             <label id="labelBase" for="baseUrl">Bas‑URL</label>
             <input id="baseUrl" placeholder="OGC: https://geo.example.se/ogcapi  •  WFS: https://server/wfs  •  Esri: lämna tomt" />
           </div>
-
           <div class="form-row">
             <label id="labelLayer" for="collectionOrType">Samling/Lager</label>
             <input id="collectionOrType" placeholder="OGC: collectionId  •  WFS: workspace:layer  •  Esri: lämna tomt" />
           </div>
-
           <div class="form-row">
             <label for="esriUrl">ArcGIS Feature Layer URL</label>
             <input id="esriUrl" placeholder="https://.../FeatureServer/0" />
           </div>
-
           <div class="form-row">
             <label for="fieldNames">Fältnamn</label>
             <input id="fieldNames" placeholder="name,address  (kommaseparerat)" value="name,address" />
           </div>
-
           <div class="form-row">
             <label for="filterExpr">Filter (valfritt)</label>
             <input id="filterExpr" placeholder="OGC: limit=1000;bbox=minx,miny,maxx,maxy  •  WFS: cql=kommun='Halmstad'  •  Esri: where=1=1" />
           </div>
-
           <div class="actions">
             <button class="btn" id="loadGisBtn">Ladda från GIS</button>
             <button class="btn btn-outline" id="clearGisBtn">Rensa</button>
             <span class="source">Inställningar sparas i denna webbläsares localStorage.</span>
           </div>
         </div>
-
-        <ul class="places" id="alarmPoints">
-          <li class="muted">Ingen GIS‑källa angiven ännu. Fyll i rutan ovan och klicka <em>Ladda från GIS</em>.</li>
-        </ul>
-        <div class="map-toolbar">
-          <button id="fitMapBtn" class="btn btn-outline" disabled>Visa alla på karta</button>
-        </div>
+        <ul class="places" id="alarmPoints"><li class="muted">Ingen GIS‑källa angiven ännu. Fyll i rutan ovan och klicka <em>Ladda från GIS</em>.</li></ul>
+        <div class="map-toolbar"><button id="fitMapBtn" class="btn btn-outline" disabled>Visa alla på karta</button></div>
         <div id="map" class="map-container" role="region" aria-label="Karta med larmpunkter"></div>
       </details>
-
       <details>
         <summary>Trygghetspunkter (öppnas vid behov)</summary>
         <div class="cards muted"><div>Inga aktiva trygghetspunkter just nu.</div></div>
       </details>
     </section>
 
-    <!-- KRISLÄGEN (inbäddad) -->
+    <!-- KRISLÄGEN -->
     <section id="panel-krislagen" class="panel panel-embed" aria-labelledby="krislagen">
       <h2>Krislägen</h2>
-      <iframe
-        class="embed-frame"
-        src="krislagen/index.html"
-        title="Krislägen – inbäddad vy"
-        loading="lazy"
-        referrerpolicy="no-referrer"
-      ></iframe>
-
+      <iframe class="embed-frame" src="krislagen/index.html" title="Krislägen – inbäddad vy" loading="lazy" referrerpolicy="no-referrer"></iframe>
       <div class="card" style="margin-top:12px;">
-        Om något ser konstigt ut:
-        <a class="btn btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
+        Om något ser konstigt ut: <a class="btn btn-outline" href="krislagen/index.html" target="_blank" rel="noopener">Öppna Krislägen i hel flik</a>
       </div>
+
+      <!-- Krislåda inuti Krislägen (details open) -->
+      <details open>
+        <summary>Krislåda (7 dagars hemberedskap enligt MSB)</summary>
+        <div class="card">
+          <h3>Checklista för hemberedskap</h3>
+          <p class="muted">Markera det du redan har. Status sparas i denna webbläsare.</p>
+          <div class="actions">
+            <button class="btn btn-outline" id="checkAllBtn-embed">Markera allt</button>
+            <button class="btn btn-outline" id="uncheckAllBtn-embed">Avmarkera allt</button>
+            <button class="btn btn-outline" id="resetToDefaultBtn-embed" title="Återställ till standardinnehåll">Återställ</button>
+            <span class="source" id="krisladaSummary-embed">0/0 klara</span>
+          </div>
+        </div>
+        <div id="krisladaContainer-embed" class="cards"></div>
+        <div class="card">
+          <h3>Export</h3>
+          <p class="muted">Ladda ner checklistan som Excel (.xlsx), grupperad per kategori. Klara rader markeras grönt, ej klara rött.</p>
+          <div class="actions"><button class="btn" id="exportExcelBtn-embed">Ladda ner som Excel</button></div>
+        </div>
+      </details>
     </section>
 
-    <!-- KRISLÅDA -->
+<!-- KRISLÅDA (egen flik) -->
     <section id="panel-krislada" class="panel" aria-labelledby="krislada">
       <h2>Krislåda</h2>
-
       <div class="card">
         <h3>Checklista för hemberedskap</h3>
         <p class="muted">Markera det du redan har. Status sparas i denna webbläsare.</p>
-
         <div class="actions">
           <button class="btn btn-outline" id="checkAllBtn">Markera allt</button>
           <button class="btn btn-outline" id="uncheckAllBtn">Avmarkera allt</button>
           <button class="btn btn-outline" id="resetToDefaultBtn" title="Återställ till standardinnehåll">Återställ</button>
-
           <span class="source" id="krisladaSummary">0/0 klara</span>
         </div>
       </div>
-
-      <!-- Kategorier + checkboxar renderas dynamiskt hit -->
       <div id="krisladaContainer" class="cards"></div>
-
       <div class="card">
-        <h3>Export/Import</h3>
-        <p class="muted">Exportera din lista (inkl. status) som JSON eller importera en egen lista.</p>
-        <div class="actions">
-          <button class="btn" id="exportBtn">Exportera JSON</button>
-          <label class="btn btn-outline" for="importFile" style="cursor:pointer;">Importera JSON</label>
-          <input type="file" id="importFile" accept="application/json" hidden />
-        </div>
+        <h3>Export</h3>
+        <p class="muted">Ladda ner checklistan som Excel (.xlsx), grupperad per kategori. Klara rader markeras grönt, ej klara rött.</p>
+        <div class="actions"><button class="btn" id="exportExcelBtn">Ladda ner som Excel</button></div>
       </div>
     </section>
 
@@ -338,7 +277,6 @@
     // ---------- Tabs ----------
     const TABS = document.querySelectorAll('.tab');
     const PANELS = document.querySelectorAll('.panel');
-
     function selectTab(id) {
       TABS.forEach(b => {
         const active = b.dataset.tab === id;
@@ -347,34 +285,15 @@
       });
       PANELS.forEach(p => p.classList.toggle('active', p.id === `panel-${id}`));
       if (id === 'platser') ensureMap();
-
-      // Initiera Krislåda första gången fliken öppnas
-      if (id === 'krislada' && !window.__krisladaInitialized) {
-        bindKrisladaTopButtons();
-        renderKrislada();
-        window.__krisladaInitialized = true;
-      }
+      if (id === 'krislada' && !window.__krisladaMainInitialized) { bindKrisladaTopButtons(''); renderKrislada(''); window.__krisladaMainInitialized = true; }
+      if (id === 'krislagen' && !window.__krisladaEmbedInitialized) { bindKrisladaTopButtons('-embed'); renderKrislada('-embed'); window.__krisladaEmbedInitialized = true; }
     }
     TABS.forEach(btn => btn.addEventListener('click', () => selectTab(btn.dataset.tab)));
 
     // ---------- PWA: Install prompt + SW registration ----------
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.hidden = false;
-    });
-
-    installBtn.addEventListener('click', async () => {
-      if (!deferredPrompt) return;
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-      installBtn.hidden = true;
-    });
-
+    let deferredPrompt; const installBtn = document.getElementById('installBtn');
+    window.addEventListener('beforeinstallprompt', (e) => { e.preventDefault(); deferredPrompt = e; installBtn.hidden = false; });
+    installBtn.addEventListener('click', async () => { if (!deferredPrompt) return; deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; installBtn.hidden = true; });
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./service-worker.js')
@@ -385,148 +304,96 @@
     // ---------- VMA & Nyheter (Krisinformation v3) ----------
     const KRIS_API = 'https://api.krisinformation.se/v3';
     const HALLAND = encodeURIComponent('Hallands län');
-
-    function formatDate(s) {
-      try { return new Date(s).toLocaleString('sv-SE',{dateStyle:'medium',timeStyle:'short'}); }
-      catch { return s; }
-    }
-
-    // Säker HTML-escape (återanvänds)
-    function escapeHtml(s) {
-      return String(s).replace(/[&<>"']/g, m => (
-        { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[m]
-      ));
-    }
-
-    function linkCard(title, body, url, meta='') {
+    function formatDate(s) { try { return new Date(s).toLocaleString('sv-SE',{dateStyle:'medium',timeStyle:'short'}); } catch { return s; } }
+    function escapeHtml(str){ return String(str ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+    function linkCard(title, body, url, meta=''){
       const a = url ? `<a class="btn btn-outline" href="${url}" target="_blank" rel="noopener">Läs mer</a>` : '';
       const m = meta ? `<div class="meta">${escapeHtml(meta)}</div>` : '';
       return `<article class="card"><h3>${escapeHtml(title)}</h3><p>${escapeHtml(body||'')}</p>${m}<div class="actions">${a}<span class="source">Källa: Krisinformation.se</span></div></article>`;
     }
 
-    // JUST NU – röd dot + VMA-banners-område
-    function ensureJustNowDot(){
-      const dot = document.getElementById('justNowDot');
-      return dot || null;
-    }
-    function setJustNowDot(active){
-      const dot = ensureJustNowDot();
-      if (dot) dot.hidden = !active;
-    }
-    function ensureJustNowBannerArea(){
-      let area = document.getElementById('justNowBanners');
-      if (!area) {
-        const rightNow = document.getElementById('rightNow');
-        if (!rightNow) return null;
-        area = document.createElement('div');
-        area.id = 'justNowBanners';
-        area.className = 'cards';
-        rightNow.prepend(area);
-      }
-      return area;
-    }
+    // JUST NU – röd dot + bannerområde
+    function ensureJustNowDot(){ return document.getElementById('justNowDot'); }
+    function setJustNowDot(active){ const dot = ensureJustNowDot(); if (dot) dot.hidden = !active; }
+    function ensureJustNowBannerArea(){ let area = document.getElementById('justNowBanners'); if (!area){ const rightNow = document.getElementById('rightNow'); if (!rightNow) return null; area = document.createElement('div'); area.id = 'justNowBanners'; area.className = 'cards'; rightNow.prepend(area); } return area; }
     function renderVmaBanners(vmas){
-      const area = ensureJustNowBannerArea();
-      if (!area) return;
-      area.innerHTML = '';
-
-      if (!Array.isArray(vmas) || !vmas.length) {
-        setJustNowDot(false);
-        return;
-      }
-
-      // Sammanfattningsbanner (C)
+      const area = ensureJustNowBannerArea(); if (!area) return; area.innerHTML='';
+      if (!Array.isArray(vmas) || !vmas.length){ setJustNowDot(false); return; }
       const count = vmas.length;
       const summary = document.createElement('article');
-      summary.className = 'card banner';
+      summary.className='card banner';
       summary.innerHTML = `
         <h3>${count} aktiv${count>1?'a':''} VMA i Halland</h3>
         <p class="muted">Se detaljer nedan eller öppna VMA‑fliken.</p>
         <div class="actions">
           <button class="btn" onclick="document.querySelector('[data-tab=\\'vma\\']').click()">Visa alla i VMA</button>
-        </div>
-      `;
+        </div>`;
       area.appendChild(summary);
 
-      // En banner per VMA (B)
-      vmas.forEach(item => {
-        const title = item.Title || item.Headline || 'VMA';
-        const desc  = item.PushMessage || item.Preamble || item.BodyText || '';
-        const link  = item.Web || item.Link || '';
-        const meta  = [
-          item.Sent && `Publicerad ${formatDate(item.Sent)}`,
-          Array.isArray(item.Counties) && item.Counties.join(', ')
-        ].filter(Boolean).join(' • ');
-
-        const card = document.createElement('article');
-        card.className = 'card banner';
+      vmas.forEach(item=>{
+        const title=item.Title||item.Headline||'VMA';
+        const desc=item.PushMessage||item.Preamble||item.BodyText||'';
+        const link=item.Web||item.Link||'';
+        const meta=[ item.Sent&&`Publicerad ${formatDate(item.Sent)}`, Array.isArray(item.Counties)&&item.Counties.join(', ')].filter(Boolean).join(' • ');
+        const card=document.createElement('article');
+        card.className='card banner';
         card.innerHTML = `
           <h3>${escapeHtml(title)}</h3>
-          ${desc ? `<p>${escapeHtml(desc)}</p>` : ''}
-          ${meta ? `<div class="meta">${escapeHtml(meta)}</div>` : ''}
+          ${desc?`<p>${escapeHtml(desc)}</p>`:''}
+          ${meta?`<div class="meta">${escapeHtml(meta)}</div>`:''}
           <div class="actions">
-            ${link ? `<a class="btn btn-outline" href="${link}" target="_blank" rel="noopener">Läs mer</a>` : ''}
+            ${link?`<a class="btn btn-outline" href="${link}" target="_blank" rel="noopener">Läs mer</a>`:''}
             <button class="btn" onclick="document.querySelector('[data-tab=\\'vma\\']').click()">Öppna VMA‑fliken</button>
-          </div>
-        `;
+          </div>`;
         area.appendChild(card);
       });
-
       setJustNowDot(true);
     }
 
-    async function loadVMA() {
-      const vmaList = document.getElementById('vmaList');
-      try {
-        const res = await fetch(`${KRIS_API}/vmas?language=sv&counties=${HALLAND}`, { headers: { accept:'application/json' }});
-        if (!res.ok) throw new Error(res.statusText);
-        const data = await res.json();
-
-        if (!Array.isArray(data) || !data.length) {
+    async function loadVMA(){
+      const vmaList=document.getElementById('vmaList');
+      try{
+        const res=await fetch(`${KRIS_API}/vmas?language=sv&counties=${HALLAND}`,{headers:{accept:'application/json'}});
+        if(!res.ok) throw new Error(res.statusText);
+        const data=await res.json();
+        if(!Array.isArray(data)||!data.length){
           vmaList.innerHTML = `<div class="card"><h3>Inga aktiva VMA för Halland</h3><p class="muted">Kontrollera senare.</p></div>`;
           renderVmaBanners([]);
           return;
         }
-
-        vmaList.innerHTML = data.map(item => {
-          const title = item.Title || item.Headline || 'VMA';
-          const desc  = item.PushMessage || item.Preamble || item.BodyText || '';
-          const link  = item.Web || item.Link || '';
-          const meta  = [
-            item.Sent && `Publicerad ${formatDate(item.Sent)}`,
-            Array.isArray(item.Counties) && item.Counties.join(', ')
-          ].filter(Boolean).join(' • ');
+        vmaList.innerHTML = data.map(item=>{
+          const title=item.Title||item.Headline||'VMA';
+          const desc=item.PushMessage||item.Preamble||item.BodyText||'';
+          const link=item.Web||item.Link||'';
+          const meta=[ item.Sent&&`Publicerad ${formatDate(item.Sent)}`, Array.isArray(item.Counties)&&item.Counties.join(', ')].filter(Boolean).join(' • ');
           return linkCard(title, desc, link, meta);
         }).join('');
-
-        // Banners i "Just nu"
         renderVmaBanners(data);
-
-      } catch (e) {
+      } catch(e){
         console.error(e);
         vmaList.innerHTML = `<div class="card"><h3>Fel</h3><p class="error">Kunde inte hämta VMA.</p></div>`;
         renderVmaBanners([]);
       }
     }
 
-    async function loadNews() {
-      const newsList = document.getElementById('newsList');
-      try {
-        const res = await fetch(`${KRIS_API}/news?language=sv&counties=${HALLAND}&numberOfNewsArticles=10`, { headers: { accept:'application/json' }});
-        if (!res.ok) throw new Error(res.statusText);
-        const data = await res.json();
-        if (!Array.isArray(data) || !data.length) {
+    async function loadNews(){
+      const newsList=document.getElementById('newsList');
+      try{
+        const res=await fetch(`${KRIS_API}/news?language=sv&counties=${HALLAND}&numberOfNewsArticles=10`,{headers:{accept:'application/json'}});
+        if(!res.ok) throw new Error(res.statusText);
+        const data=await res.json();
+        if(!Array.isArray(data)||!data.length){
           newsList.innerHTML = `<div class="card"><h3>Inga nyheter just nu</h3><p class="muted">Kontrollera senare.</p></div>`;
           return;
         }
-        newsList.innerHTML = data.map(item => {
-          const title = item.Title || 'Nyhet';
-          const desc  = item.Preamble || item.BodyText || '';
-          const link  = item.Web || item.Link || '';
-          const meta  = [item.Published && `Publicerad ${formatDate(item.Published)}`].filter(Boolean).join(' • ');
+        newsList.innerHTML = data.map(item=>{
+          const title=item.Title||'Nyhet';
+          const desc=item.Preamble||item.BodyText||'';
+          const link=item.Web||item.Link||'';
+          const meta=[ item.Published&&`Publicerad ${formatDate(item.Published)}`].filter(Boolean).join(' • ');
           return linkCard(title, desc, link, meta);
         }).join('');
-      } catch (e) {
+      } catch(e){
         console.error(e);
         newsList.innerHTML = `<div class="card"><h3>Fel</h3><p class="error">Kunde inte hämta nyheter.</p></div>`;
       }
@@ -535,160 +402,114 @@
     loadVMA();
     loadNews();
 
-    // ---------- Karta + GIS-källa ----------
-    let map, markersLayer;
-    const alarmPointsList = document.getElementById('alarmPoints');
-    const fitMapBtn = document.getElementById('fitMapBtn');
-
-    function ensureMap(){
-      if (map) return;
-      if (typeof L === 'undefined') {
-        console.warn('Leaflet kunde inte laddas.');
-        return;
-      }
-      map = L.map('map', { scrollWheelZoom:true });
+    // ---------- Karta + GIS ----------
+    let map, markersLayer; const alarmPointsList=document.getElementById('alarmPoints'); const fitMapBtn=document.getElementById('fitMapBtn');
+    function ensureMap(){ if(map) return; if(typeof L==='undefined'){ console.warn('Leaflet kunde inte laddas.'); return; }
+      map = L.map('map',{scrollWheelZoom:true});
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{
         maxZoom:19,
         attribution:'&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>'
       }).addTo(map);
-      markersLayer = L.layerGroup().addTo(map);
-      map.setView([56.673, 12.857], 11); // Halmstad med omnejd
+      markersLayer=L.layerGroup().addTo(map);
+      map.setView([56.673,12.857],11);
     }
-
-    function googleMapsLink(address){
-      return `https://www.google.com/maps?q=${encodeURIComponent(address)}`;
-    }
-
+    function googleMapsLink(address){ return `https://www.google.com/maps?q=${encodeURIComponent(address)}`; }
     function renderAlarmList(items){
-      if (!items.length) {
-        alarmPointsList.innerHTML = `<li class="muted">Inga punkter att visa.</li>`;
-        fitMapBtn.disabled = true; return;
-      }
-      alarmPointsList.innerHTML = items.map(i => {
-        const url = googleMapsLink(`${i.name} ${i.address||''}`);
+      if(!items.length){ alarmPointsList.innerHTML = `<li class="muted">Inga punkter att visa.</li>`; fitMapBtn.disabled=true; return; }
+      alarmPointsList.innerHTML = items.map(i=>{
+        const url=googleMapsLink(`${i.name} ${i.address||''}`);
         return `<li><strong>${i.name}</strong><br/>${i.address||''}<br/><a href="${url}" target="_blank" rel="noopener">Öppna i kartapp</a></li>`;
       }).join('');
-      fitMapBtn.disabled = false;
-      const b = L.latLngBounds(items.map(i => i.latlng));
-      fitMapBtn.onclick = () => map.fitBounds(b.pad(0.2));
+      fitMapBtn.disabled=false;
+      const b=L.latLngBounds(items.map(i=>i.latlng));
+      fitMapBtn.onclick = ()=> map.fitBounds(b.pad(0.2));
       map.fitBounds(b.pad(0.2));
     }
-
     async function loadFromOGC(baseUrl, collectionId, nameField, addrField, extra){
-      const url = new URL(`${baseUrl.replace(/\/$/,'')}/collections/${encodeURIComponent(collectionId)}/items`);
+      const url=new URL(`${baseUrl.replace(/\/$/,'')}/collections/${encodeURIComponent(collectionId)}/items`);
       url.searchParams.set('limit', extra?.limit || '1000');
-      if (extra?.bbox) url.searchParams.set('bbox', extra.bbox);
-
-      const res = await fetch(url.toString());
-      if (!res.ok) throw new Error(await res.text());
-      const gj = await res.json();
+      if(extra?.bbox) url.searchParams.set('bbox', extra.bbox);
+      const res=await fetch(url.toString());
+      if(!res.ok) throw new Error(await res.text());
+      const gj=await res.json();
       return (gj.features||[]).filter(f=>f.geometry?.type==='Point').map(f=>{
-        const [lon,lat] = f.geometry.coordinates;
-        return {
-          name: f.properties?.[nameField] || f.properties?.namn || 'Larmpunkt',
-          address: f.properties?.[addrField] || f.properties?.adress || '',
-          latlng: L.latLng(lat, lon)
-        };
+        const [lon,lat]=f.geometry.coordinates;
+        return { name: f.properties?.[nameField] || f.properties?.namn || 'Larmpunkt',
+                 address: f.properties?.[addrField] || f.properties?.adress || '',
+                 latlng: L.latLng(lat,lon) };
       });
     }
-
     async function loadFromWFS(url, typeName, nameField, addrField, extra){
-      // Obs: Kräver CORS på WFS-servern eller proxy/JSONP.
-      const params = new URLSearchParams({
-        service:'WFS', version:'1.1.0', request:'GetFeature',
-        typeName, srsName:'EPSG:4326', outputFormat:'application/json'
-      });
-      if (extra?.cql) params.set('CQL_FILTER', extra.cql);
-
-      const res = await fetch(`${url}?${params.toString()}`);
-      if (!res.ok) throw new Error(await res.text());
-      const gj = await res.json();
+      const params=new URLSearchParams({service:'WFS',version:'1.1.0',request:'GetFeature',typeName,srsName:'EPSG:4326',outputFormat:'application/json'});
+      if(extra?.cql) params.set('CQL_FILTER', extra.cql);
+      const res=await fetch(`${url}?${params.toString()}`);
+      if(!res.ok) throw new Error(await res.text());
+      const gj=await res.json();
       return (gj.features||[]).filter(f=>f.geometry?.type==='Point').map(f=>{
-        const [lon,lat] = f.geometry.coordinates;
-        return {
-          name: f.properties?.[nameField] || f.properties?.namn || 'Larmpunkt',
-          address: f.properties?.[addrField] || f.properties?.adress || '',
-          latlng: L.latLng(lat, lon)
-        };
+        const [lon,lat]=f.geometry.coordinates;
+        return { name: f.properties?.[nameField] || f.properties?.namn || 'Larmpunkt',
+                 address: f.properties?.[addrField] || f.properties?.adress || '',
+                 latlng: L.latLng(lat,lon) };
       });
     }
-
     function loadFromEsri(esriUrl, nameField, addrField, where){
-      return new Promise((resolve, reject)=>{
+      return new Promise((resolve,reject)=>{
         try{
-          if (!L.esri) throw new Error('Esri Leaflet saknas.');
-          const layer = L.esri.featureLayer({
-            url: esriUrl, where: where || '1=1',
-            pointToLayer: (geojson, latlng)=>L.marker(latlng)
-          });
-          const out = [];
+          if(!L.esri) throw new Error('Esri Leaflet saknas.');
+          const layer=L.esri.featureLayer({ url: esriUrl, where: where || '1=1', pointToLayer: (geojson,latlng)=>L.marker(latlng) });
+          const out=[];
           layer.once('load', ()=>{
             markersLayer.addLayer(layer);
-            layer.eachFeature((layerFeat)=>{
-              const f = layerFeat.feature;
-              const name = f?.properties?.[nameField] || 'Larmpunkt';
-              const addr = f?.properties?.[addrField] || '';
+            layer.eachFeature(layerFeat=>{
+              const f=layerFeat.feature;
+              const name=f?.properties?.[nameField] || 'Larmpunkt';
+              const addr=f?.properties?.[addrField] || '';
               out.push({ name, address: addr, latlng: layerFeat.getLatLng() });
             });
             resolve(out);
           });
-          layer.once('error', (e)=>reject(e));
+          layer.once('error', e=>reject(e));
         } catch(e){ reject(e); }
       });
     }
-
     function parseExtra(s){
-      if (!s) return null;
-      // key=value separerade med ; eller ,
-      const parts = s.split(/\s*;\s*|\s*,\s*/).filter(Boolean);
-      const out = {};
-      parts.forEach(p=>{
-        const [k,v] = p.split('=');
-        if (!k || !v) return;
-        out[k.trim()] = v.trim();
-      });
+      if(!s) return null;
+      const parts=s.split(/\s*;\s*|\s*,\s*/).filter(Boolean);
+      const out={}; parts.forEach(p=>{ const [k,v]=p.split('='); if(!k||!v) return; out[k.trim()]=v.trim(); });
       return out;
     }
-
     async function handleLoadGIS(){
-      ensureMap(); if (markersLayer) markersLayer.clearLayers();
+      ensureMap(); if(markersLayer) markersLayer.clearLayers();
       alarmPointsList.innerHTML = `<li class="muted">Hämtar från GIS …</li>`;
-
-      const mode = document.getElementById('gisMode').value;
-      const nameAddr = (document.getElementById('fieldNames').value||'name,address').split(',');
-      const nameField = (nameAddr[0]||'name').trim();
-      const addrField = (nameAddr[1]||'address').trim();
-
-      let items = [];
-      try {
-        if (mode==='ogc'){
-          const base = document.getElementById('baseUrl').value.trim();
-          const coll = document.getElementById('collectionOrType').value.trim();
-          const extra = parseExtra(document.getElementById('filterExpr').value);
-          items = await loadFromOGC(base, coll, nameField, addrField, extra);
-        } else if (mode==='wfs'){
-          const wfsUrl = document.getElementById('baseUrl').value.trim();
-          const typeName = document.getElementById('collectionOrType').value.trim();
-          const extra = parseExtra(document.getElementById('filterExpr').value);
-          items = await loadFromWFS(wfsUrl, typeName, nameField, addrField, { cql: extra?.cql });
-        } else if (mode==='esri'){
-          const esriUrl = document.getElementById('esriUrl').value.trim();
-          const extra = parseExtra(document.getElementById('filterExpr').value);
-          items = await loadFromEsri(esriUrl, nameField, addrField, extra?.where);
+      const mode=document.getElementById('gisMode').value;
+      const nameAddr=(document.getElementById('fieldNames').value||'name,address').split(',');
+      const nameField=(nameAddr[0]||'name').trim();
+      const addrField=(nameAddr[1]||'address').trim();
+      let items=[];
+      try{
+        if(mode==='ogc'){
+          const base=document.getElementById('baseUrl').value.trim();
+          const coll=document.getElementById('collectionOrType').value.trim();
+          const extra=parseExtra(document.getElementById('filterExpr').value);
+          items=await loadFromOGC(base,coll,nameField,addrField,extra);
+        } else if(mode==='wfs'){
+          const wfsUrl=document.getElementById('baseUrl').value.trim();
+          const typeName=document.getElementById('collectionOrType').value.trim();
+          const extra=parseExtra(document.getElementById('filterExpr').value);
+          items=await loadFromWFS(wfsUrl,typeName,nameField,addrField,{cql:extra?.cql});
+        } else if(mode==='esri'){
+          const esriUrl=document.getElementById('esriUrl').value.trim();
+          const extra=parseExtra(document.getElementById('filterExpr').value);
+          items=await loadFromEsri(esriUrl,nameField,addrField,extra?.where);
         }
       } catch(e){
         console.error(e);
         alarmPointsList.innerHTML = `<li class="error">Kunde inte läsa från GIS‑källan. Kontrollera URL, lager och CORS.</li>`;
         return;
       }
-
-      // Markörer & lista
-      items.forEach(i => L.marker(i.latlng).addTo(markersLayer).bindPopup(`<strong>${i.name}</strong><br>${i.address||''}`));
+      items.forEach(i=> L.marker(i.latlng).addTo(markersLayer).bindPopup(`<strong>${i.name}</strong><br>${i.address||''}`));
       renderAlarmList(items);
-
-      // Spara lokalt
-      const cfg = {
-        mode,
+      const cfg={ mode,
         baseUrl: document.getElementById('baseUrl').value,
         collectionOrType: document.getElementById('collectionOrType').value,
         esriUrl: document.getElementById('esriUrl').value,
@@ -697,9 +518,7 @@
       };
       localStorage.setItem('kris-halmstad-gis', JSON.stringify(cfg));
     }
-
     document.getElementById('loadGisBtn').addEventListener('click', handleLoadGIS);
-
     document.getElementById('clearGisBtn').addEventListener('click', ()=>{
       localStorage.removeItem('kris-halmstad-gis');
       alarmPointsList.innerHTML = `<li class="muted">Inställningarna rensade. Fyll i rutan ovan och ladda igen.</li>`;
@@ -709,13 +528,10 @@
       document.getElementById('esriUrl').value = '';
       document.getElementById('filterExpr').value = '';
     });
-
-    // Återställ sparade GIS-inställningar vid laddning
     (function restore(){
-      const raw = localStorage.getItem('kris-halmstad-gis');
-      if (!raw) return;
+      const raw=localStorage.getItem('kris-halmstad-gis'); if(!raw) return;
       try{
-        const cfg = JSON.parse(raw);
+        const cfg=JSON.parse(raw);
         document.getElementById('gisMode').value = cfg.mode || 'ogc';
         document.getElementById('baseUrl').value = cfg.baseUrl || '';
         document.getElementById('collectionOrType').value = cfg.collectionOrType || '';
@@ -728,161 +544,121 @@
     /* ============================
        === KRISLÅDA: Data & logik ===
        ============================ */
-
-    const KRISLADA_STORE_KEY = 'kris-halmstad-krislada';
-
-    // 7-dagars hemberedskap enligt MSB + scenarier (Extremvärme borttagen) + lokal placeholder
-    const KRISLADA_DEFAULT = [
-      { category: 'Vatten', items: [
-        { text: 'Dricksvatten för minst 7 dagar (3–5 liter/person/dag)', done: false },
-        { text: 'Rena vattenbehållare/dunkar (livsmedelsgodkända, lock)', done: false },
-        { text: 'Vattenrening (filter/tabletter/kokmöjlighet)', done: false },
-        { text: 'Livsmedelssäkra flaskor för rotation (märk datum)', done: false }
+    const KRISLADA_STORE_KEY='kris-halmstad-krislada';
+    const KRISLADA_DEFAULT=[
+      { category:'Vatten', items:[
+        { text:'Dricksvatten för minst 7 dagar (3–5 liter/person/dag)', done:false },
+        { text:'Rena vattenbehållare/dunkar (livsmedelsgodkända, lock)', done:false },
+        { text:'Vattenrening (filter/tabletter/kokmöjlighet)', done:false },
+        { text:'Livsmedelssäkra flaskor för rotation (märk datum)', done:false }
       ]},
-      { category: 'Mat', items: [
-        { text: 'Konserver (soppor, bönor, fisk, grytor)', done: false },
-        { text: 'Torrvaror (pasta, ris, gryn, knäckebröd)', done: false },
-        { text: 'Nötter, torkad frukt, energibars', done: false },
-        { text: 'Barnmat/specialkost (vid behov), husdjur: foder', done: false },
-        { text: 'Manuell konservöppnare', done: false }
+      { category:'Mat', items:[
+        { text:'Konserver (soppor, bönor, fisk, grytor)', done:false },
+        { text:'Torrvaror (pasta, ris, gryn, knäckebröd)', done:false },
+        { text:'Nötter, torkad frukt, energibars', done:false },
+        { text:'Barnmat/specialkost (vid behov), husdjur: foder', done:false },
+        { text:'Manuell konservöppnare', done:false }
       ]},
-      { category: 'Matlagning & Värme', items: [
-        { text: 'Stormkök/gasolkök + bränsle (ventilera säkert)', done: false },
-        { text: 'Tändstickor/tändare (vattenskyddade)', done: false },
-        { text: 'Kastrull, stekpanna, värmetåliga underlägg', done: false },
-        { text: 'Värmeljus/stearinljus + hållare (brandsäkert avstånd)', done: false },
-        { text: 'Filtrar och varma kläder (lager‑på‑lager)', done: false }
+      { category:'Matlagning & Värme', items:[
+        { text:'Stormkök/gasolkök + bränsle (ventilera säkert)', done:false },
+        { text:'Tändstickor/tändare (vattenskyddade)', done:false },
+        { text:'Kastrull, stekpanna, värmetåliga underlägg', done:false },
+        { text:'Värmeljus/stearinljus + hållare (brandsäkert avstånd)', done:false },
+        { text:'Filtrar och varma kläder (lager‑på‑lager)', done:false }
       ]},
-      { category: 'Belysning & Energi', items: [
-        { text: 'Ficklampa/pannlampa till alla i hushållet', done: false },
-        { text: 'Batterier i rätt storlek (rotationssystem)', done: false },
-        { text: 'Powerbank(ar) + kablar (håll laddade)', done: false },
-        { text: 'Solpanel liten/vevladdare (valfritt komplement)', done: false }
+      { category:'Belysning & Energi', items:[
+        { text:'Ficklampa/pannlampa till alla i hushållet', done:false },
+        { text:'Batterier i rätt storlek (rotationssystem)', done:false },
+        { text:'Powerbank(ar) + kablar (håll laddade)', done:false },
+        { text:'Solpanel liten/vevladdare (valfritt komplement)', done:false }
       ]},
-      { category: 'Kommunikation & Information', items: [
-        { text: 'Batteri‑ eller vevradio för VMA/krisinformation', done: false },
-        { text: 'Viktiga nummer utskrivna (SOS 112, 113 13, 1177)', done: false },
-        { text: 'Kontaktlista till grannar/anhöriga (utskriven)', done: false },
-        { text: 'Laddad mobil + ev. kontantkort/reservtelefon', done: false }
+      { category:'Kommunikation & Information', items:[
+        { text:'Batteri‑ eller vevradio för VMA/krisinformation', done:false },
+        { text:'Viktiga nummer utskrivna (SOS 112, 113 13, 1177)', done:false },
+        { text:'Kontaktlista till grannar/anhöriga (utskriven)', done:false },
+        { text:'Laddad mobil + ev. kontantkort/reservtelefon', done:false }
       ]},
-      { category: 'Sjukvård & Hygien', items: [
-        { text: 'Första hjälpen‑kit (plåster, sårvård, förband)', done: false },
-        { text: 'Personliga läkemedel för minst 7 dagar', done: false },
-        { text: 'Smärtstillande/febernedsättande (enligt behov)', done: false },
-        { text: 'Hygien: tvål, våtservetter, toalettpapper', done: false },
-        { text: 'Soppåsar/torrtoalettlösning (vid längre avbrott)', done: false }
+      { category:'Sjukvård & Hygien', items:[
+        { text:'Första hjälpen‑kit (plåster, sårvård, förband)', done:false },
+        { text:'Personliga läkemedel för minst 7 dagar', done:false },
+        { text:'Smärtstillande/febernedsättande (enligt behov)', done:false },
+        { text:'Hygien: tvål, våtservetter, toalettpapper', done:false },
+        { text:'Soppåsar/torrtoalettlösning (vid längre avbrott)', done:false }
       ]},
-      { category: 'Dokument & Betalning', items: [
-        { text: 'ID‑handlingar/kopior (förvarat vattenskyddat)', done: false },
-        { text: 'Kontanter i små valörer', done: false },
-        { text: 'Viktiga avtal/policys/nummer (utskrivet & digitalt)', done: false }
+      { category:'Dokument & Betalning', items:[
+        { text:'ID‑handlingar/kopior (förvarat vattenskyddat)', done:false },
+        { text:'Kontanter i små valörer', done:false },
+        { text:'Viktiga avtal/policys/nummer (utskrivet & digitalt)', done:false }
       ]},
-      { category: 'Verktyg & Övrigt', items: [
-        { text: 'Multiverktyg/kniv, silvertejp/snöre/buntband', done: false },
-        { text: 'Fickkniv/sax, arbetshandskar, fickvärmare', done: false },
-        { text: 'Ficklampa extra, reflekterande väst', done: false }
+      { category:'Verktyg & Övrigt', items:[
+        { text:'Multiverktyg/kniv, silvertejp/snöre/buntband', done:false },
+        { text:'Fickkniv/sax, arbetshandskar, fickvärmare', done:false },
+        { text:'Ficklampa extra, reflekterande väst', done:false }
       ]},
-      { category: 'Scenarier: Långvarigt elavbrott', items: [
-        { text: 'Samla hushållet i ett rum, täta drag, använd filtar', done: false },
-        { text: 'Spara batteri: stäng av onödiga enheter', done: false },
-        { text: 'Mat: ät färskvaror först, planera måltider', done: false },
-        { text: 'Ventilation vid öppen låga/stormkök – brandsäkerhet', done: false }
+      { category:'Scenarier: Långvarigt elavbrott', items:[
+        { text:'Samla hushållet i ett rum, täta drag, använd filtar', done:false },
+        { text:'Spara batteri: stäng av onödiga enheter', done:false },
+        { text:'Mat: ät färskvaror först, planera måltider', done:false },
+        { text:'Ventilation vid öppen låga/stormkök – brandsäkerhet', done:false }
       ]},
-      { category: 'Scenarier: Ingen mobiltelefoni/internet', items: [
-        { text: 'Använd utskrivna kontaktlistor & uppsamlingsplats', done: false },
-        { text: 'Följ vev-/batteriradio för VMA och lägesbild', done: false },
-        { text: 'Överenskomna tider för fysiska avstämningar', done: false }
+      { category:'Scenarier: Ingen mobiltelefoni/internet', items:[
+        { text:'Använd utskrivna kontaktlistor & uppsamlingsplats', done:false },
+        { text:'Följ vev-/batteriradio för VMA och lägesbild', done:false },
+        { text:'Överenskomna tider för fysiska avstämningar', done:false }
       ]},
-      { category: 'Lokala resurser (Halmstad)', items: [
-        { text: 'Trygghetspunkter (öppnas vid behov) – se kommunens info', done: false },
-        { text: 'Vattenutlämning – plats och tider (vid behov)', done: false },
-        { text: 'Lokal information: www.halmstad.se/kris (uppdaterad länk)', done: false }
+      { category:'Lokala resurser (Halmstad)', items:[
+        { text:'Trygghetspunkter (öppnas vid behov) – se kommunens info', done:false },
+        { text:'Vattenutlämning – plats och tider (vid behov)', done:false },
+        { text:'Lokal information: www.halmstad.se/kris (uppdaterad länk)', done:false }
       ]}
     ];
+    function loadKrislada(){ try{ const raw=localStorage.getItem(KRISLADA_STORE_KEY); if(!raw) return structuredClone(KRISLADA_DEFAULT); const parsed=JSON.parse(raw); if(!Array.isArray(parsed)) return structuredClone(KRISLADA_DEFAULT); return parsed; } catch { return structuredClone(KRISLADA_DEFAULT); } }
+    function saveKrislada(state){ localStorage.setItem(KRISLADA_STORE_KEY, JSON.stringify(state)); }
+    function summarize(state){ let total=0, done=0; state.forEach(cat=>cat.items.forEach(it=>{ total+=1; if(it.done) done+=1; })); return { total, done }; }
 
-    function loadKrislada() {
-      try {
-        const raw = localStorage.getItem(KRISLADA_STORE_KEY);
-        if (!raw) return structuredClone(KRISLADA_DEFAULT);
-        const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return structuredClone(KRISLADA_DEFAULT);
-        return parsed;
-      } catch {
-        return structuredClone(KRISLADA_DEFAULT);
-      }
-    }
-
-    function saveKrislada(state) {
-      localStorage.setItem(KRISLADA_STORE_KEY, JSON.stringify(state));
-    }
-
-    function summarize(state) {
-      let total = 0, done = 0;
-      state.forEach(cat => cat.items.forEach(it => { total += 1; if (it.done) done += 1; }));
-      return { total, done };
-    }
-
-    // === Emoji per kategori + flik-räknare ===
-    const KRISLADA_EMOJI_RULES = [
-      { test: n => n === 'Vatten',                        emoji: '💧' },
-      { test: n => n === 'Mat',                           emoji: '🍲' },
-      { test: n => n.startsWith('Matlagning'),            emoji: '🍳' },
-      { test: n => n === 'Belysning & Energi',            emoji: '🔦' },
-      { test: n => n.startsWith('Kommunikation'),         emoji: '📻' },
-      { test: n => n === 'Sjukvård & Hygien',             emoji: '🩹' },
-      { test: n => n.startsWith('Dokument'),              emoji: '🪪' },
-      { test: n => n.startsWith('Verktyg'),               emoji: '🧰' },
-      { test: n => n.includes('Elavbrott'),               emoji: '⚡️' },
-      { test: n => n.includes('Ingen mobil'),             emoji: '📵' },
-      { test: n => n.startsWith('Lokala resurser'),       emoji: '📍' },
+    // Emoji per kategori + flik-räknare
+    const KRISLADA_EMOJI_RULES=[
+      { test:n=> n==='Vatten', emoji:'💧' },
+      { test:n=> n==='Mat', emoji:'🍲' },
+      { test:n=> n.startsWith('Matlagning'), emoji:'🍳' },
+      { test:n=> n==='Belysning & Energi', emoji:'🔦' },
+      { test:n=> n.startsWith('Kommunikation'), emoji:'📻' },
+      { test:n=> n==='Sjukvård & Hygien', emoji:'🩹' },
+      { test:n=> n.startsWith('Dokument'), emoji:'🪪' },
+      { test:n=> n.startsWith('Verktyg'), emoji:'🧰' },
+      { test:n=> n.includes('Elavbrott'), emoji:'⚡️' },
+      { test:n=> n.includes('Ingen mobil'), emoji:'📵' },
+      { test:n=> n.startsWith('Lokala resurser'), emoji:'📍' },
     ];
-    function emojiForCategory(name){
-      const n = String(name || '');
-      const rule = KRISLADA_EMOJI_RULES.find(r => r.test(n));
-      return rule ? rule.emoji : '🎒';
-    }
-
+    function emojiForCategory(name){ const n=String(name||''); const rule=KRISLADA_EMOJI_RULES.find(r=>r.test(n)); return rule?rule.emoji:'🎒'; }
     function ensureKrisladaTabShell(){
-      const btn = document.querySelector('.tab[data-tab="krislada"]');
-      if (!btn) return { btn:null, countEl:null };
-      let label = btn.querySelector('.tab-label');
-      let count = btn.querySelector('.tab-count');
-      if (!label || !count){
+      const btn=document.querySelector('.tab[data-tab="krislada"]'); if(!btn) return { btn:null, countEl:null };
+      let label=btn.querySelector('.tab-label'); let count=btn.querySelector('.tab-count');
+      if(!label||!count){
         btn.innerHTML = `<span class="tab-label">🎒 Krislåda</span><span class="tab-count">0/0</span>`;
-        label = btn.querySelector('.tab-label');
-        count = btn.querySelector('.tab-count');
+        label=btn.querySelector('.tab-label'); count=btn.querySelector('.tab-count');
       }
-      return { btn, countEl: count };
+      return { btn, countEl:count };
     }
-    function updateKrisladaTabCounter(done, total){
-      const { countEl } = ensureKrisladaTabShell();
-      if (countEl) countEl.textContent = `${done}/${total}`;
+    function updateKrisladaTabCounter(done,total){
+      const {countEl}=ensureKrisladaTabShell(); if(countEl) countEl.textContent = `${done}/${total}`;
     }
 
     let krisladaState = loadKrislada();
-    {
-      const { total, done } = summarize(krisladaState);
-      updateKrisladaTabCounter(done, total);
-    }
+    { const { total, done } = summarize(krisladaState); updateKrisladaTabCounter(done,total); }
 
-    function renderKrislada() {
-      const wrap = document.getElementById('krisladaContainer');
-      if (!wrap) return;
-
-      wrap.innerHTML = krisladaState.map((cat, cIdx) => {
-        const doneCount = cat.items.filter(i => i.done).length;
-        const total = cat.items.length;
-
-        const itemsHtml = cat.items.map((it, iIdx) => {
-          const id = `item-${cIdx}-${iIdx}`;
-          return `
-            <li>
-              <input type="checkbox" id="${id}" data-cindex="${cIdx}" data-iindex="${iIdx}" ${it.done ? 'checked' : ''} />
+    function renderKrislada(suffix){
+      const wrap=document.getElementById(`krisladaContainer${suffix}`); if(!wrap) return;
+      wrap.innerHTML = krisladaState.map((cat,cIdx)=>{
+        const doneCount=cat.items.filter(i=>i.done).length;
+        const total=cat.items.length;
+        const itemsHtml = cat.items.map((it,iIdx)=>{
+          const id=`item-${suffix||'main'}-${cIdx}-${iIdx}`;
+          return `<li>
+              <input type="checkbox" id="${id}" data-cindex="${cIdx}" data-iindex="${iIdx}" ${it.done?'checked':''} />
               <label for="${id}">${escapeHtml(it.text)}</label>
-            </li>
-          `;
+            </li>`;
         }).join('');
-
         return `
           <article class="card">
             <div class="category-header">
@@ -896,107 +672,108 @@
             <ul class="checklist">
               ${itemsHtml}
             </ul>
-          </article>
-        `;
+          </article>`;
       }).join('');
-
       // Checkbox-händelser
-      wrap.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-        cb.addEventListener('change', (e) => {
-          const c = +e.target.dataset.cindex;
-          const i = +e.target.dataset.iindex;
+      wrap.querySelectorAll('input[type="checkbox"]').forEach(cb=>{
+        cb.addEventListener('change', (e)=>{
+          const c=+e.target.dataset.cindex; const i=+e.target.dataset.iindex;
           krisladaState[c].items[i].done = e.target.checked;
           saveKrislada(krisladaState);
-
-          // Uppdatera sammanfattning + flik-räknare
-          const sumEl = document.getElementById('krisladaSummary');
-          if (sumEl) {
-            const { total, done } = summarize(krisladaState);
-            sumEl.textContent = `${done}/${total} klara`;
-            updateKrisladaTabCounter(done, total);
-          }
-
-          // Re-render för att uppdatera per-kategori-badge
-          renderKrislada();
+          const sumEl=document.getElementById(`krisladaSummary${suffix}`);
+          if(sumEl){ const { total, done } = summarize(krisladaState); sumEl.textContent = `${done}/${total} klara`; updateKrisladaTabCounter(done,total); }
+          renderKrislada(suffix);
         });
       });
-
       // Kategori-knappar
-      wrap.querySelectorAll('button[data-action]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const c = +btn.dataset.cat;
-          const action = btn.dataset.action;
-          krisladaState[c].items.forEach(it => it.done = (action === 'check-all'));
+      wrap.querySelectorAll('button[data-action]').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          const c=+btn.dataset.cat; const action=btn.dataset.action;
+          krisladaState[c].items.forEach(it=> it.done = (action==='check-all'));
           saveKrislada(krisladaState);
-          renderKrislada();
+          renderKrislada(suffix);
         });
       });
-
       // Total-sammanfattning
-      const sumEl = document.getElementById('krisladaSummary');
-      if (sumEl) {
-        const { total, done } = summarize(krisladaState);
-        sumEl.textContent = `${done}/${total} klara`;
-        updateKrisladaTabCounter(done, total);
-      }
+      const sumEl=document.getElementById(`krisladaSummary${suffix}`);
+      if(sumEl){ const { total, done } = summarize(krisladaState); sumEl.textContent = `${done}/${total} klara`; updateKrisladaTabCounter(done,total); }
     }
 
-    function bindKrisladaTopButtons() {
-      const checkAllBtn = document.getElementById('checkAllBtn');
-      const uncheckAllBtn = document.getElementById('uncheckAllBtn');
-      const resetBtn = document.getElementById('resetToDefaultBtn');
-      const exportBtn = document.getElementById('exportBtn');
-      const importFile = document.getElementById('importFile');
+    function bindKrisladaTopButtons(suffix){
+      const checkAllBtn=document.getElementById(`checkAllBtn${suffix}`);
+      const uncheckAllBtn=document.getElementById(`uncheckAllBtn${suffix}`);
+      const resetBtn=document.getElementById(`resetToDefaultBtn${suffix}`);
+      const exportExcelBtn=document.getElementById(`exportExcelBtn${suffix}`);
 
-      checkAllBtn?.addEventListener('click', () => {
-        krisladaState.forEach(cat => cat.items.forEach(it => it.done = true));
+      checkAllBtn?.addEventListener('click', ()=>{
+        krisladaState.forEach(cat=>cat.items.forEach(it=> it.done=true));
         saveKrislada(krisladaState);
-        renderKrislada();
+        renderKrislada(suffix);
       });
-
-      uncheckAllBtn?.addEventListener('click', () => {
-        krisladaState.forEach(cat => cat.items.forEach(it => it.done = false));
+      uncheckAllBtn?.addEventListener('click', ()=>{
+        krisladaState.forEach(cat=>cat.items.forEach(it=> it.done=false));
         saveKrislada(krisladaState);
-        renderKrislada();
+        renderKrislada(suffix);
       });
-
-      resetBtn?.addEventListener('click', () => {
-        if (!confirm('Återställa Krislåda till standardinnehåll? Detta ersätter din nuvarande lista.')) return;
-        krisladaState = structuredClone(KRISLADA_DEFAULT);
+      resetBtn?.addEventListener('click', ()=>{
+        if(!confirm('Återställa Krislåda till standardinnehåll? Detta ersätter din nuvarande lista.')) return;
+        krisladaState=structuredClone(KRISLADA_DEFAULT);
         saveKrislada(krisladaState);
-        renderKrislada();
+        renderKrislada(suffix);
       });
-
-      exportBtn?.addEventListener('click', () => {
-        const blob = new Blob([JSON.stringify(krisladaState, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url; a.download = 'krislada.json'; a.click();
-        URL.revokeObjectURL(url);
+      exportExcelBtn?.addEventListener('click', async ()=>{
+        try{ await exportKrisladaToExcel(krisladaState); }
+        catch(err){ console.error(err); alert('Kunde inte skapa Excel-fil.'); }
       });
+    }
 
-      importFile?.addEventListener('change', async (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-        try {
-          const text = await file.text();
-          const data = JSON.parse(text);
-          if (!Array.isArray(data)) throw new Error('Felaktigt format');
-          data.forEach(cat => {
-            if (typeof cat.category !== 'string' || !Array.isArray(cat.items)) throw new Error('Felaktig kategori');
-            cat.items.forEach(it => {
-              if (typeof it.text !== 'string') throw new Error('Felaktig post');
-              if (typeof it.done !== 'boolean') it.done = !!it.done;
-            });
+    // Excel-export (grupper + färg)
+    async function exportKrisladaToExcel(state){
+      const wb=new ExcelJS.Workbook();
+      wb.created=new Date(); wb.creator='Kris Halmstad';
+      const ws=wb.addWorksheet('Krislåda',{properties:{defaultRowHeight:18}});
+
+      const titleRow=ws.addRow(['Krislåda – hemberedskap (7 dagar)']);
+      titleRow.font={bold:true,size:14,color:{argb:'FFFFFFFF'}};
+      titleRow.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF004A7F'}};
+      ws.mergeCells('A1:C1');
+      ws.addRow([]);
+
+      const headerStyle={ font:{bold:true,color:{argb:'FFFFFFFF'}},
+        fill:{type:'pattern',pattern:'solid',fgColor:{argb:'FF223042'}},
+        border:{ top:{style:'thin',color:{argb:'FF223042'}}, left:{style:'thin',color:{argb:'FF223042'}},
+                 bottom:{style:'thin',color:{argb:'FF223042'}}, right:{style:'thin',color:{argb:'FF223042'}} } };
+      const rowStyle={ border:{ top:{style:'thin',color:{argb:'FF223042'}}, left:{style:'thin',color:{argb:'FF223042'}},
+                 bottom:{style:'thin',color:{argb:'FF223042'}}, right:{style:'thin',color:{argb:'FF223042'}} } };
+      const doneFill={type:'pattern',pattern:'solid',fgColor:{argb:'FFC6EFCE'}};
+      const notDoneFill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFC7CE'}};
+
+      state.forEach(cat=>{
+        const catRow=ws.addRow([`${emojiForCategory(cat.category)} ${cat.category}`]);
+        catRow.font={bold:true,size:12,color:{argb:'FFFFFFFF'}};
+        catRow.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FF101C29'}};
+        ws.mergeCells(`A${catRow.number}:C${catRow.number}`);
+
+        const head=ws.addRow(['Post','Klar','Kategori']);
+        [1,2,3].forEach(c=>{
+          const cell=head.getCell(c);
+          Object.assign(cell,{font:headerStyle.font, fill:headerStyle.fill, border:headerStyle.border});
+        });
+
+        (cat.items||[]).forEach(it=>{
+          const row=ws.addRow([ it.text||'', it.done?'Ja':'Nej', cat.category ]);
+          row.eachCell((cell,col)=>{
+            cell.border=rowStyle.border;
+            if(col!==3){ cell.fill = it.done ? doneFill : notDoneFill; }
           });
-          krisladaState = data;
-          saveKrislada(krisladaState);
-          renderKrislada();
-          e.target.value = '';
-        } catch (err) {
-          alert('Kunde inte importera JSON: ' + (err?.message || err));
-        }
+        });
+
+        ws.addRow([]);
       });
+
+      [40,10,22].forEach((w,i)=> ws.getColumn(i+1).width=w);
+      const buffer=await wb.xlsx.writeBuffer();
+      saveAs(new Blob([buffer],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), 'krislada.xlsx');
     }
   </script>
 </body>
