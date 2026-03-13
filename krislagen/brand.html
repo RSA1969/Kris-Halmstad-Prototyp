@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="sv">
 <head>
@@ -8,7 +9,6 @@
   <script defer src="./app.js"></script>
 </head>
 <body>
-
 <header>
   <div class="title">
     <a class="back" href="./index.html">← Alla krislägen</a>
@@ -53,32 +53,15 @@
     </ul>
   </section>
 
-  <!-- Förberedelser -->
+  <!-- Förberedelser (endast Före krisen) -->
   <section class="section">
     <h3>Förberedelser</h3>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="fore">Före krisen</button>
-      <button class="tab" data-tab="efter">Efter krisen</button>
-    </div>
-
-    <!-- Före krisen -->
-    <div id="fore" class="tab-panel" style="display:none">
+    <div id="fore" class="tab-panel">
       <ul class="checklist">
         <li><input type="checkbox"/> Ha hemberedskap för minst en vecka.</li>
         <li><input type="checkbox"/> Vatten, mat, värmekällor, ficklampa och powerbank.</li>
         <li><input type="checkbox"/> Viktiga telefonnummer: 112, 113 13, 1177, 114 14.</li>
         <li><input type="checkbox"/> Familjeplan: var träffas ni, vem hämtar barn.</li>
-      </ul>
-    </div>
-
-    <!-- Efter krisen -->
-    <div id="efter" class="tab-panel" style="display:none">
-      <ul class="checklist">
-        <li><input type="checkbox"/> Vänta på klartecken från räddningstjänst eller myndigheter.</li>
-        <li><input type="checkbox"/> Kontrollera eventuella rök- och brandskador.</li>
-        <li><input type="checkbox"/> Ventilera bostaden om rök kommit in.</li>
-        <li><input type="checkbox"/> Se över och förbättra hemberedskapen.</li>
       </ul>
     </div>
 
@@ -93,4 +76,3 @@
 </main>
 </body>
 </html>
-``
