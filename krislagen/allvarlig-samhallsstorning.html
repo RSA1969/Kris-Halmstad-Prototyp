@@ -1,17 +1,16 @@
-
 <!doctype html>
 <html lang="sv">
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Allvarlig samhällsstörning – Krislägen</title>
-  ./styles.css
-  ./app.jsscript>
+  <link rel="stylesheet" href="./styles.css"/>
+  <script defer src="./app.js"></script>
 </head>
 <body>
 <header>
   <div class="title">
-    ./index.html← Alla krislägen</a>
+    <a class="back" href="./index.html">← Alla krislägen</a>
     <h1>❗ Allvarlig samhällsstörning</h1>
   </div>
 </header>
@@ -22,9 +21,9 @@
   <section class="section">
     <h3>Så vet du att det gäller</h3>
     <ul>
-      <li>Störningar som påverkar viktiga samhällsfunktioner som el, vatten, kommunikation och transporter.</li>
-      <li>Tecken kan vara stora avbrott i el/IT, svårigheter att nå nödnummer eller att flera tjänster ligger nere samtidigt.</li>
-      <li>Information ges via Krisinformation.se, SR P4 Halland och Halmstads kommuns kanaler.</li>
+      <li>Störningar som påverkar el, vatten, kommunikation eller transporter.</li>
+      <li>Tecken: stora avbrott i el/IT, svårt att nå nödnummer, flera funktioner nere samtidigt.</li>
+      <li>Information ges via Krisinformation.se, SR P4 Halland och Halmstads kommun.</li>
     </ul>
     <div class="source">Källa: MSB & Halmstads kommun.</div>
   </section>
@@ -34,9 +33,9 @@
     <h3>Det här gör du direkt</h3>
     <ul>
       <li>Säkra liv och egendom – ring 112 vid akut fara.</li>
-      <li>Följ information från Krisinformation.se och Halmstads kommun.</li>
-      <li>Kontrollera lokal lägesbild via Sveriges Radio P4 Halland.</li>
-      <li>Hjälp närstående enligt din familjeplan.</li>
+      <li>Följ information från Krisinformation.se och kommunens kanaler.</li>
+      <li>Kontrollera lokal lägesbild via SR P4 Halland.</li>
+      <li>Stöd närstående enligt din familjeplan.</li>
     </ul>
     <div class="source">Källa: MSB:s generella krisråd.</div>
   </section>
@@ -45,40 +44,23 @@
   <section class="section">
     <h3>Det här gör kommunen</h3>
     <ul>
-      <li>Aktiverar krisledningsorganisationen vid behov – krisledningsnämnd och operativ krisledning.</li>
-      <li>Säkerställer att samhällsviktig verksamhet kan fortsätta, t.ex. el, vatten, omsorg, IT och kommunikation.</li>
-      <li>Samverkar med räddningstjänst, polis, Region Halland och Trafikverket.</li>
+      <li>Aktiverar krisledningsorganisationen vid behov.</li>
+      <li>Säkerställer samhällsviktig verksamhet: el, vatten, omsorg, IT, kommunikation.</li>
+      <li>Samverkar med polis, räddningstjänst, Region Halland och Trafikverket.</li>
       <li>Kommunicerar via webb, sociala medier och kontaktcenter.</li>
       <li>Öppnar trygghetspunkter vid behov.</li>
     </ul>
   </section>
 
-  <!-- Förberedelser -->
+  <!-- Förberedelser (endast Före krisen) -->
   <section class="section">
     <h3>Förberedelser</h3>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="fore">Före krisen</button>
-      <button class="tab" data-tab="efter">Efter krisen</button>
-    </div>
-
-    <!-- Före krisen -->
-    <div id="fore" class="tab-panel" style="display:none">
+    <div id="fore" class="tab-panel">
       <ul class="checklist">
-        <li><input type="checkbox"/> Ha hemberedskap för minst en vecka enligt MSB.</li>
-        <li><input type="checkbox"/> Vatten, mat, värmekälla, ficklampa, powerbank och radio (vev/batteri).</li>
+        <li><input type="checkbox"/> Ha hemberedskap för minst en vecka.</li>
+        <li><input type="checkbox"/> Vatten, mat, värmekälla, ficklampa och powerbank.</li>
         <li><input type="checkbox"/> Viktiga telefonnummer: 112, 113 13, 1177, 114 14.</li>
-        <li><input type="checkbox"/> Familjeplan: var träffas ni, vem hämtar barnen, alternativa kontaktvägar.</li>
-        <li><input type="checkbox"/> Följ Halmstads kommun och Krisinformation.se i sociala medier.</li>
-      </ul>
-    </div>
-
-    <!-- Efter krisen -->
-    <div id="efter" class="tab-panel" style="display:none">
-      <ul class="checklist">
-        <li><input type="checkbox"/> Följ kommunens information om när tjänster återställs.</li>
-        <li><input type="checkbox"/> Rapportera skador vid behov och komplettera ditt förråd.</li>
-        <li><input type="checkbox"/> Stöd närstående och reflektera över vad som kan förbättras i din beredskap.</li>
+        <li><input type="checkbox"/> Familjeplan: var träffas ni, vem hämtar barnen.</li>
       </ul>
     </div>
 
