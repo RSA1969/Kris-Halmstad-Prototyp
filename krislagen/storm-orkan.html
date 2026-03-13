@@ -8,68 +8,81 @@
   <script defer src="./app.js"></script>
 </head>
 <body>
+
 <header>
   <div class="title">
     <a class="back" href="./index.html">← Alla krislägen</a>
     <h1>🌪️ Storm / Orkan</h1>
   </div>
 </header>
+
 <main>
+
+  <!-- Så vet du att det gäller -->
   <section class="section">
     <h3>Så vet du att det gäller</h3>
     <ul>
-      <li>Exempelpunkt 1 – hur du känner igen läget.</li>
-      <li>Exempelpunkt 2 – typiska tecken/varningar.</li>
-      <li>Exempelpunkt 3 – informationskällor.</li>
+      <li>SMHI varnar för storm/styvvind/orkanstyrka; kraftiga vindbyar och risk för nedfallna träd och föremål.</li>
+      <li>Typiska tecken: störningar i el och tele, skadade tak, flygande föremål, svår eller omöjlig framkomlighet.</li>
+      <li>Information ges via SMHI, Krisinformation.se, SR P4 Halland och Halmstads kommuns kanaler.</li>
     </ul>
-    <div class="source">Källa: Kommunens och myndigheters publika råd.</div>
+    <div class="source">Källa: MSB, SMHI & Halmstads kommun.</div>
   </section>
 
+  <!-- Det här gör du direkt -->
   <section class="section warn">
     <h3>Det här gör du direkt</h3>
     <ul>
-      <li>Säkerställ liv/egendom, ring 112 vid akut fara.</li>
-      <li>Följ information från Krisinformation.se och lokal kanal.</li>
-      <li>Hjälp närstående enligt din plan.</li>
+      <li>Säkra liv och egendom – ring 112 vid akut fara.</li>
+      <li>Stanna inomhus om möjligt. Håll fönster och dörrar stängda och håll dig borta från fönster vid hårda vindbyar.</li>
+      <li>Undvik onödiga resor; kör inte där träd/el-linor kan ha fallit. Gå inte nära nedfallna ledningar.</li>
+      <li>Följ information från Krisinformation.se, SMHI och Halmstads kommun.</li>
     </ul>
-    <div class="source">Källa: Generella krisråd (anpassa lokalt).</div>
+    <div class="source">Källa: MSB:s generella krisråd.</div>
   </section>
 
+  <!-- Det här gör kommunen -->
   <section class="section">
     <h3>Det här gör kommunen</h3>
     <ul>
-      <li>Aktiverar krisledning och informationskanaler.</li>
-      <li>Samverkar med räddningstjänst, polis, region, trafik.</li>
-      <li>Öppnar trygghetspunkter vid behov.</li>
+      <li>Aktiverar krisledning vid behov och samverkar med räddningstjänst, polis, Region Halland, Trafikverket och nätägare.</li>
+      <li>Arbetar med röjning av träd, hinder och säkring av samhällsviktig infrastruktur.</li>
+      <li>Informerar löpande via webb, sociala medier och kontaktcenter och öppnar trygghetspunkter vid behov.</li>
     </ul>
   </section>
 
+  <!-- Förberedelser -->
   <section class="section">
     <h3>Förberedelser</h3>
+
     <div class="tabs">
       <button class="tab active" data-tab="fore">Före krisen</button>
       <button class="tab" data-tab="efter">Efter krisen</button>
     </div>
 
+    <!-- Före krisen -->
     <div id="fore" class="tab-panel" style="display:none">
       <ul class="checklist">
-        <li><input type="checkbox"/> Ha hemberedskap för minst en vecka.</li>
-        <li><input type="checkbox"/> Vatten, mat, värmekällor, ficklampor och powerbank.</li>
+        <li><input type="checkbox"/> Ha hemberedskap för minst en vecka (vatten, mat, värme, ficklampor, radio, powerbank).</li>
+        <li><input type="checkbox"/> Säkra/ta in lösa föremål utomhus (möbler, studsmattor, verktyg).</li>
+        <li><input type="checkbox"/> Ladda mobil och powerbanks; ha alternativ belysning.</li>
+        <li><input type="checkbox"/> Känn till hur du stänger av spis och hanterar elavbrott på ett säkert sätt.</li>
         <li><input type="checkbox"/> Viktiga telefonnummer: 112, 113 13, 1177, 114 14.</li>
-        <li><input type="checkbox"/> Familjeplan: var träffas ni, vem hämtar barn.</li>
       </ul>
     </div>
+
+    <!-- Efter krisen -->
     <div id="efter" class="tab-panel" style="display:none">
       <ul class="checklist">
-        <li><input type="checkbox"/> Vänta på klartecken från myndigheter.</li>
-        <li><input type="checkbox"/> Komplettera förbrukade förråd.</li>
-        <li><input type="checkbox"/> Reflektera över vad som fungerade och kan förbättras.</li>
+        <li><input type="checkbox"/> Vänta på klartecken från myndigheter innan du ger dig ut.</li>
+        <li><input type="checkbox"/> Undvik nedfallna elledningar och rapportera akuta faror (112 vid fara för liv/egendom).</li>
+        <li><input type="checkbox"/> Dokumentera skador för försäkring; kontrollera tak, fönster och vatteninträngning.</li>
+        <li><input type="checkbox"/> Komplettera förbrukade förråd och förbättra din beredskapsplan utifrån erfarenheterna.</li>
       </ul>
     </div>
 
     <script>
-      // init persistence keys per page
-      document.addEventListener('DOMContentLoaded',()=>{
+      document.addEventListener('DOMContentLoaded', () => {
         setupChecklist('storm-orkan');
       });
     </script>
@@ -77,5 +90,6 @@
 
   <div class="footer-space"></div>
 </main>
+
 </body>
 </html>
