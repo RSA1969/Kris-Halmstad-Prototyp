@@ -8,70 +8,83 @@
   <script defer src="./app.js"></script>
 </head>
 <body>
+
 <header>
   <div class="title">
     <a class="back" href="./index.html">← Alla krislägen</a>
     <h1>🔥 Brand</h1>
   </div>
 </header>
+
 <main>
+
+  <!-- Så vet du att det gäller -->
   <section class="section">
     <h3>Så vet du att det gäller</h3>
     <ul>
-      <li>Exempelpunkt 1 – hur du känner igen läget det brinner.</li>
-      <li>Exempelpunkt 2 – typiska tecken/varningar.</li>
-      <li>Exempelpunkt 3 – informationskällor.</li>
-      <li>Exempelpunkt 4 – skogsbränder.</li>
+      <li>Lukt av rök eller synlig brandrök i området.</li>
+      <li>Typiska tecken: spridande rök, brandlukt, hög värme, knäppande ljud från byggnader.</li>
+      <li>Information ges via Krisinformation.se, SR P4 Halland och Halmstads kommuns kanaler.</li>
+      <li>Vid skogsbrand: snabb spridning, torr vegetation, vindburna gnistor.</li>
     </ul>
-    <div class="source">Källa: Kommunens och myndigheters publika råd.</div>
+    <div class="source">Källa: MSB & Halmstads kommun.</div>
   </section>
 
+  <!-- Det här gör du direkt -->
   <section class="section warn">
     <h3>Det här gör du direkt</h3>
     <ul>
-      <li>Säkerställ liv/egendom, ring 112 vid akut fara.</li>
-      <li>Följ information från Krisinformation.se och lokal kanal.</li>
-      <li>Hjälp närstående enligt din plan.</li>
+      <li>Säkra liv och egendom – ring 112 vid akut brand eller fara.</li>
+      <li>Följ instruktioner från Krisinformation.se och Räddningstjänsten.</li>
+      <li>Håll avstånd från brandområdet och följ lokal information.</li>
+      <li>Hjälp närstående enligt er familjeplan.</li>
     </ul>
-    <div class="source">Källa: Generella krisråd (anpassa lokalt).</div>
+    <div class="source">Källa: MSB:s generella krisråd.</div>
   </section>
 
+  <!-- Det här gör kommunen -->
   <section class="section">
     <h3>Det här gör kommunen</h3>
     <ul>
-      <li>Aktiverar krisledning och informationskanaler.</li>
-      <li>Samverkar med räddningstjänst, polis, region, trafik.</li>
+      <li>Aktiverar krisledning och kommunikationskanaler.</li>
+      <li>Samverkar med räddningstjänst, polis, Region Halland och Trafikverket.</li>
+      <li>Sprider aktuell lägesbild via webb och sociala medier.</li>
       <li>Öppnar trygghetspunkter vid behov.</li>
     </ul>
   </section>
 
+  <!-- Förberedelser -->
   <section class="section">
     <h3>Förberedelser</h3>
+
     <div class="tabs">
       <button class="tab active" data-tab="fore">Före krisen</button>
       <button class="tab" data-tab="efter">Efter krisen</button>
     </div>
 
+    <!-- Före krisen -->
     <div id="fore" class="tab-panel" style="display:none">
       <ul class="checklist">
         <li><input type="checkbox"/> Ha hemberedskap för minst en vecka.</li>
-        <li><input type="checkbox"/> Vatten, mat, värmekällor, ficklampor och powerbank.</li>
+        <li><input type="checkbox"/> Vatten, mat, värmekällor, ficklampa och powerbank.</li>
         <li><input type="checkbox"/> Viktiga telefonnummer: 112, 113 13, 1177, 114 14.</li>
         <li><input type="checkbox"/> Familjeplan: var träffas ni, vem hämtar barn.</li>
       </ul>
     </div>
+
+    <!-- Efter krisen -->
     <div id="efter" class="tab-panel" style="display:none">
       <ul class="checklist">
-        <li><input type="checkbox"/> Vänta på klartecken från myndigheter.</li>
-        <li><input type="checkbox"/> Komplettera förbrukade förråd.</li>
-        <li><input type="checkbox"/> Reflektera över vad som fungerade och kan förbättras.</li>
+        <li><input type="checkbox"/> Vänta på klartecken från räddningstjänst eller myndigheter.</li>
+        <li><input type="checkbox"/> Kontrollera eventuella rök- och brandskador.</li>
+        <li><input type="checkbox"/> Ventilera bostaden om rök kommit in.</li>
+        <li><input type="checkbox"/> Se över och förbättra hemberedskapen.</li>
       </ul>
     </div>
 
     <script>
-      // init persistence keys per page
-      document.addEventListener('DOMContentLoaded',()=>{
-        setupChecklist('brand');
+      document.addEventListener('DOMContentLoaded', () => {
+        setupChecklist('brand-kris');
       });
     </script>
   </section>
@@ -80,3 +93,4 @@
 </main>
 </body>
 </html>
+``
