@@ -6,26 +6,33 @@
   <title>Krislåda – Krislägen</title>
 
   <link rel="stylesheet" href="./styles.css"/>
-  <!-- Excel export -->
+
+  <!-- Excel Export -->
   <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
   <style>
-    /* Lokal knappstil – påverkar inte övriga sidor */
-    .actions-top{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
-    .btn{padding:8px 12px;border-radius:10px;font-weight:600;cursor:pointer}
-    .btn-outline{border:1px solid #2ea3ff;background:transparent;color:#2ea3ff}
-    .btn-primary{border:1px solid #0072ce;background:#0072ce;color:#fff}
-    .summary{margin-left:auto;color:#a6b7c8;font-size:12px;align-self:center}
-    /* Kategoriruta återanvänder styles.css .section-look med strukturen här */
-    .category{border:1px solid var(--border);border-radius:14px;background:#101722;padding:12px;margin:12px 0}
-    .category h3{margin:0 0 8px 0}
-    .checklist{list-style:none;padding-left:0;display:grid;gap:10px;margin:0}
-    .checklist li{display:flex;align-items:flex-start;gap:10px;background:#0f1720;border:1px solid var(--border);border-radius:10px;padding:10px}
-    .checklist input{margin-top:2px}
+    .actions-top {display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+    .btn {padding:8px 12px;border-radius:10px;font-weight:600;cursor:pointer}
+    .btn-outline {border:1px solid #2ea3ff;background:transparent;color:#2ea3ff}
+    .btn-primary {border:1px solid #0072ce;background:#0072ce;color:white}
+    .summary {margin-left:auto;color:#a6b7c8;font-size:12px;align-self:center}
+
+    .category {border:1px solid var(--border);border-radius:14px;background:#101722;padding:12px;margin:14px 0}
+    .category h3 {margin:0 0 8px 0}
+
+    .checklist {list-style:none;padding-left:0;display:grid;gap:10px}
+    .checklist li {
+      display:flex;align-items:flex-start;gap:10px;
+      background:#0f1720;border:1px solid var(--border);
+      padding:10px;border-radius:10px;
+    }
+    .checklist input {margin-top:2px}
   </style>
+
 </head>
 <body>
+
 <header>
   <div class="title">
     <a class="back" href="./index.html">← Alla krislägen</a>
@@ -34,7 +41,8 @@
 </header>
 
 <main>
-  <!-- Topp-knappar -->
+
+  <!-- TOP BUTTONS -->
   <section class="section">
     <div class="actions-top">
       <button class="btn btn-outline" id="checkAllBtn">Markera allt</button>
@@ -45,133 +53,171 @@
     </div>
   </section>
 
-  <!-- Dynamiskt innehåll -->
+  <!-- CONTENT -->
   <section id="krisladaContainer"></section>
 
   <div class="footer-space"></div>
 </main>
 
 <script>
-/* ========= Data ========= */
-const STORE_KEY = 'kris-halmstad-krislada';
+/* ===============================
+   DATA
+================================= */
+
+const STORE_KEY = "kris-halmstad-krislada";
+
 const DEFAULT = [
-  { category:'Vatten 💧', items:[
-    { text:'Dricksvatten 3–5 liter/person/dag i minst 7 dagar', done:false },
-    { text:'Livsmedelsgodkända dunkar/flaskor med lock', done:false },
-    { text:'Vattenrening (tabletter/filter/koka)', done:false }
+  { category:"Vatten 💧", items:[
+    { text:"Dricksvatten 3–5 liter/person/dag i minst 7 dagar", done:false },
+    { text:"Livsmedelsgodkända dunkar/flaskor med lock", done:false },
+    { text:"Vattenrening (tabletter/filter/koka)", done:false }
   ]},
-  { category:'Mat 🍲', items:[
-    { text:'Konserver (soppa, gryta, bönor, fisk)', done:false },
-    { text:'Torrvaror (ris, pasta, gryn, knäckebröd)', done:false },
-    { text:'Bars, nötter, torkad frukt', done:false },
-    { text:'Barnmat/specialkost vid behov', done:false }
+  { category:"Mat 🍲", items:[
+    { text:"Konserver (soppa, gryta, bönor, fisk)", done:false },
+    { text:"Torrvaror (ris, pasta, knäckebröd)", done:false },
+    { text:"Bars, nötter, torkad frukt", done:false },
+    { text:"Barnmat/specialkost vid behov", done:false }
   ]},
-  { category:'Matlagning & Värme 🍳', items:[
-    { text:'Stormkök/gas + bränsle (vädra säkert)', done:false },
-    { text:'Tändstickor/tändare', done:false },
-    { text:'Värmeljus/stearinljus + hållare', done:false },
-    { text:'Filtar/varma kläder (lager-på-lager)', done:false }
+  { category:"Matlagning & Värme 🍳", items:[
+    { text:"Stormkök/gas + bränsle", done:false },
+    { text:"Tändstickor/tändare", done:false },
+    { text:"Värmeljus/stearinljus + hållare", done:false },
+    { text:"Filtar/varma kläder", done:false }
   ]},
-  { category:'Energi & Kommunikation 🔦📻', items:[
-    { text:'Powerbank(ar) + kablar', done:false },
-    { text:'Fick- eller pannlampa + batterier', done:false },
-    { text:'Batteri-/vevradio för VMA/krisinformation', done:false },
-    { text:'Utskrivna nödnummer: 112, 113 13, 1177, 114 14', done:false }
+  { category:"Energi & Kommunikation 🔦📻", items:[
+    { text:"Powerbanks + kablar", done:false },
+    { text:"Fick-/pannlampa + batterier", done:false },
+    { text:"Vev-/batteriradio", done:false },
+    { text:"Utskrivna nödnummer", done:false }
   ]},
-  { category:'Hygien & Sjukvård 🩹', items:[
-    { text:'Första hjälpen-kit', done:false },
-    { text:'Personliga läkemedel för 7 dagar', done:false },
-    { text:'Tvål, våtservetter, toalettpapper', done:false }
+  { category:"Hygien & Sjukvård 🩹", items:[
+    { text:"Första hjälpen-kit", done:false },
+    { text:"Personliga läkemedel i 7 dagar", done:false },
+    { text:"Tvål, våtservetter, toalettpapper", done:false }
   ]},
-  { category:'Dokument & Betalning 🪪', items:[
-    { text:'ID-/kopior vattenskyddat', done:false },
-    { text:'Kontanter i små valörer', done:false }
+  { category:"Dokument & Betalning 🪪", items:[
+    { text:"ID/kopior vattenskyddat", done:false },
+    { text:"Kontanter i små valörer", done:false }
   ]},
-  { category:'Övrigt 🧰', items:[
-    { text:'Multiverktyg/kniv, silvertejp, snöre/buntband', done:false },
-    { text:'Reflexväst(er), extra ficklampa', done:false }
+  { category:"Övrigt 🧰", items:[
+    { text:"Multiverktyg, silvertejp, snöre/buntband", done:false },
+    { text:"Reflexväst, extra ficklampa", done:false }
   ]}
 ];
 
-/* ========= Storage ========= */
+/* ===============================
+   STORAGE
+================================= */
+
 const load = () => {
-  try{
+  try {
     const raw = localStorage.getItem(STORE_KEY);
-    if(!raw) return structuredClone(DEFAULT);
+    if (!raw) return structuredClone(DEFAULT);
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : structuredClone(DEFAULT);
-  }catch{ return structuredClone(DEFAULT); }
+  } catch {
+    return structuredClone(DEFAULT);
+  }
 };
-const save = s => localStorage.setItem(STORE_KEY, JSON.stringify(s));
+
+const save = (state) => {
+  localStorage.setItem(STORE_KEY, JSON.stringify(state));
+};
 
 let state = load();
 
-/* ========= Render ========= */
-function summarize(s){ let t=0,d=0; s.forEach(c=>c.items.forEach(i=>{t++; if(i.done) d++;})); return {t,d}; }
+/* ===============================
+   RENDER
+================================= */
 
-function render(){
-  const wrap = document.getElementById('krisladaContainer');
-  const sum = document.getElementById('summary');
-  wrap.innerHTML = state.map((cat, ci) => {
-    const items = (cat.items||[]).map((it, ii) => `
-      <li>
-        <input type="checkbox" id="i_${ci}_${ii}" ${it.done ? 'checked':''}
-               onchange="toggle(${ci},${ii},this.checked)">
-        <label for="i_${ci}_${ii}">${it.text}</label>
-      </li>`).join('');
-    return `
-      <article class="category">
-        <h3>${cat.category}</h3>
-        <ul class="checklist">${items}</ul>
-      </article>`;
-  }).join('');
-
-  const {t,d} = summarize(state);
-  sum.textContent = `${d}/${t} klara`;
+function summarize() {
+  let t = 0, d = 0;
+  state.forEach(cat => cat.items.forEach(i => { t++; if (i.done) d++; }));
+  return { t, d };
 }
 
-window.toggle = (ci,ii,val)=>{
+function render() {
+  const wrap = document.getElementById("krisladaContainer");
+  const summaryEl = document.getElementById("summary");
+
+  wrap.innerHTML = state.map((cat, ci) => `
+    <article class="category">
+      <h3>${cat.category}</h3>
+      <ul class="checklist">
+        ${cat.items.map((it, ii) => `
+          <li>
+            <input type="checkbox" id="c_${ci}_${ii}" ${it.done ? "checked" : ""}
+              onchange="toggle(${ci},${ii},this.checked)">
+            <label for="c_${ci}_${ii}">${it.text}</label>
+          </li>`).join("")}
+      </ul>
+    </article>
+  `).join("");
+
+  const { t, d } = summarize();
+  summaryEl.textContent = `${d}/${t} klara`;
+}
+
+window.toggle = (ci, ii, val) => {
   state[ci].items[ii].done = val;
   save(state);
   render();
 };
 
-/* ========= Buttons ========= */
-document.getElementById('checkAllBtn').onclick = ()=>{
-  state.forEach(c=>c.items.forEach(i=>i.done=true));
-  save(state); render();
-};
-document.getElementById('uncheckAllBtn').onclick = ()=>{
-  state.forEach(c=>c.items.forEach(i=>i.done=false));
-  save(state); render();
-};
-document.getElementById('resetBtn').onclick = ()=>{
-  if(!confirm('Återställa Krislådan till originalinnehåll?')) return;
-  state = structuredClone(DEFAULT); save(state); render();
-};
-document.getElementById('exportBtn').onclick = async ()=>{
-  const wb = new ExcelJS.Workbook();
-  wb.created = new Date(); wb.creator = 'Kris Halmstad';
-  const ws = wb.addWorksheet('Krislåda',{properties:{defaultRowHeight:18}});
+/* ===============================
+   BUTTON ACTIONS
+================================= */
 
-  ws.addRow(['Krislåda – Hemberedskap (7 dagar)']).font = { bold:true, size:16 };
+document.getElementById("checkAllBtn").onclick = () => {
+  state.forEach(c => c.items.forEach(i => i.done = true));
+  save(state);
+  render();
+};
+
+document.getElementById("uncheckAllBtn").onclick = () => {
+  state.forEach(c => c.items.forEach(i => i.done = false));
+  save(state);
+  render();
+};
+
+document.getElementById("resetBtn").onclick = () => {
+  if (confirm("Återställ Krislådan?")) {
+    state = structuredClone(DEFAULT);
+    save(state);
+    render();
+  }
+};
+
+/* ===============================
+   EXCEL EXPORT
+================================= */
+
+document.getElementById("exportBtn").onclick = async () => {
+  const wb = new ExcelJS.Workbook();
+  const ws = wb.addWorksheet("Krislåda");
+
+  ws.addRow(["Krislåda – Hemberedskap"]).font = { bold: true, size: 18 };
   ws.addRow([]);
 
-  state.forEach(cat=>{
-    ws.addRow([cat.category]).font = { bold:true };
-    ws.addRow(['Post','Klar']);
-    cat.items.forEach(it=> ws.addRow([it.text, it.done ? 'Ja':'Nej']));
+  state.forEach(cat => {
+    ws.addRow([cat.category]).font = { bold: true };
+    ws.addRow(["Post", "Klar"]);
+    cat.items.forEach(it => ws.addRow([it.text, it.done ? "Ja" : "Nej"]));
     ws.addRow([]);
   });
 
   const buf = await wb.xlsx.writeBuffer();
-  saveAs(new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),'krislada.xlsx');
+  saveAs(new Blob([buf]), "krislada.xlsx");
 };
 
-/* ========= Init ========= */
+/* ===============================
+   INIT
+================================= */
+
 render();
 </script>
 
 </body>
 </html>
+
 
