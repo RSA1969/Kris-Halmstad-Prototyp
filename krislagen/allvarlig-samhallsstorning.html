@@ -3,15 +3,16 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Allvarlig samhällsstörning – Krislägen</title>
+  <title>Brand – Krislägen</title>
   <link rel="stylesheet" href="./styles.css"/>
   <script defer src="./app.js"></script>
 </head>
 <body>
+
 <header>
   <div class="title">
     <a class="back" href="./index.html">← Alla krislägen</a>
-    <h1>❗ Allvarlig samhällsstörning</h1>
+    <h1>🔥 Brand</h1>
   </div>
 </header>
 
@@ -21,9 +22,10 @@
   <section class="section">
     <h3>Så vet du att det gäller</h3>
     <ul>
-      <li>Störningar som påverkar el, vatten, kommunikation eller transporter.</li>
-      <li>Tecken: stora avbrott i el/IT, svårt att nå nödnummer, flera funktioner nere samtidigt.</li>
-      <li>Information ges via Krisinformation.se, SR P4 Halland och Halmstads kommun.</li>
+      <li>Lukt av rök eller synlig brandrök i området.</li>
+      <li>Typiska tecken: spridande rök, brandlukt, hög värme, knäppande ljud från byggnader.</li>
+      <li>Information ges via Krisinformation.se, SR P4 Halland och Halmstads kommuns kanaler.</li>
+      <li>Vid skogsbrand: snabb spridning, torr vegetation, vindburna gnistor.</li>
     </ul>
     <div class="source">Källa: MSB & Halmstads kommun.</div>
   </section>
@@ -32,10 +34,10 @@
   <section class="section warn">
     <h3>Det här gör du direkt</h3>
     <ul>
-      <li>Säkra liv och egendom – ring 112 vid akut fara.</li>
-      <li>Följ information från Krisinformation.se och kommunens kanaler.</li>
-      <li>Kontrollera lokal lägesbild via SR P4 Halland.</li>
-      <li>Stöd närstående enligt din familjeplan.</li>
+      <li>Säkra liv och egendom – ring 112 vid akut brand eller fara.</li>
+      <li>Följ instruktioner från Krisinformation.se och Räddningstjänsten.</li>
+      <li>Håll avstånd från brandområdet och följ lokal information.</li>
+      <li>Hjälp närstående enligt er familjeplan.</li>
     </ul>
     <div class="source">Källa: MSB:s generella krisråd.</div>
   </section>
@@ -44,29 +46,45 @@
   <section class="section">
     <h3>Det här gör kommunen</h3>
     <ul>
-      <li>Aktiverar krisledningsorganisationen vid behov.</li>
-      <li>Säkerställer samhällsviktig verksamhet: el, vatten, omsorg, IT, kommunikation.</li>
-      <li>Samverkar med polis, räddningstjänst, Region Halland och Trafikverket.</li>
-      <li>Kommunicerar via webb, sociala medier och kontaktcenter.</li>
+      <li>Aktiverar krisledning och kommunikationskanaler.</li>
+      <li>Samverkar med räddningstjänst, polis, Region Halland och Trafikverket.</li>
+      <li>Sprider aktuell lägesbild via webb och sociala medier.</li>
       <li>Öppnar trygghetspunkter vid behov.</li>
     </ul>
   </section>
 
-  <!-- Förberedelser (endast Före krisen) -->
+  <!-- Förberedelser -->
   <section class="section">
     <h3>Förberedelser</h3>
-    <div id="fore" class="tab-panel">
+
+    <div class="tabs">
+      <button class="tab active" data-tab="fore">Före krisen</button>
+      <button class="tab" data-tab="efter">Efter krisen</button>
+    </div>
+
+    <!-- Före krisen -->
+    <div id="fore" class="tab-panel" style="display:none">
       <ul class="checklist">
         <li><input type="checkbox"/> Ha hemberedskap för minst en vecka.</li>
-        <li><input type="checkbox"/> Vatten, mat, värmekälla, ficklampa och powerbank.</li>
+        <li><input type="checkbox"/> Vatten, mat, värmekällor, ficklampa och powerbank.</li>
         <li><input type="checkbox"/> Viktiga telefonnummer: 112, 113 13, 1177, 114 14.</li>
-        <li><input type="checkbox"/> Familjeplan: var träffas ni, vem hämtar barnen.</li>
+        <li><input type="checkbox"/> Familjeplan: var träffas ni, vem hämtar barn.</li>
+      </ul>
+    </div>
+
+    <!-- Efter krisen -->
+    <div id="efter" class="tab-panel" style="display:none">
+      <ul class="checklist">
+        <li><input type="checkbox"/> Vänta på klartecken från räddningstjänst eller myndigheter.</li>
+        <li><input type="checkbox"/> Kontrollera eventuella rök- och brandskador.</li>
+        <li><input type="checkbox"/> Ventilera bostaden om rök kommit in.</li>
+        <li><input type="checkbox"/> Se över och förbättra hemberedskapen.</li>
       </ul>
     </div>
 
     <script>
-      document.addEventListener('DOMContentLoaded',()=>{
-        setupChecklist('allvarlig-samhallsstorning');
+      document.addEventListener('DOMContentLoaded', () => {
+        setupChecklist('brand-kris');
       });
     </script>
   </section>
@@ -75,3 +93,4 @@
 </main>
 </body>
 </html>
+``
