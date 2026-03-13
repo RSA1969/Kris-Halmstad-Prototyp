@@ -4,14 +4,13 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Evakuering / Utrymning – Krislägen</title>
-  ./styles.css
-  ./app.jsscript>
+  <link rel="stylesheet" href="./styles.css"/>
+  <script defer src="./app.js"></script>
 </head>
 <body>
-
 <header>
   <div class="title">
-    ./index.html← Alla krislägen</a>
+    <a class="back" href="./index.html">← Alla krislägen</a>
     <h1>🚨 Evakuering / Utrymning</h1>
   </div>
 </header>
@@ -52,32 +51,15 @@
     </ul>
   </section>
 
-  <!-- Förberedelser -->
+  <!-- Förberedelser (endast Före krisen) -->
   <section class="section">
     <h3>Förberedelser</h3>
-
-    <div class="tabs">
-      <button class="tab active" data-tab="fore">Före krisen</button>
-      <button class="tab" data-tab="efter">Efter krisen</button>
-    </div>
-
-    <!-- Före krisen -->
-    <div id="fore" class="tab-panel" style="display:none">
+    <div id="fore" class="tab-panel">
       <ul class="checklist">
         <li><input type="checkbox"/> Ha hemberedskap för minst en vecka.</li>
         <li><input type="checkbox"/> Packa en enkel evakueringsväska (mat, vatten, mediciner, ficklampa).</li>
         <li><input type="checkbox"/> Lär dig utrymningsvägar och samlingsplatser i din närhet.</li>
         <li><input type="checkbox"/> Viktiga telefonnummer: 112, 113 13, 1177, 114 14.</li>
-      </ul>
-    </div>
-
-    <!-- Efter krisen -->
-    <div id="efter" class="tab-panel" style="display:none">
-      <ul class="checklist">
-        <li><input type="checkbox"/> Vänta på klartecken från myndigheter innan du återvänder hem.</li>
-        <li><input type="checkbox"/> Kontrollera byggnadens säkerhet efter händelsen.</li>
-        <li><input type="checkbox"/> Följ kommunens fortsatta information.</li>
-        <li><input type="checkbox"/> Dokumentera skador och kontakta försäkring.</li>
       </ul>
     </div>
 
