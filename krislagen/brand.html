@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="sv">
 <head>
@@ -18,7 +17,6 @@
 
 <main>
 
-  <!-- Så vet du att det gäller -->
   <section class="section">
     <h3>Så vet du att det gäller</h3>
     <ul>
@@ -30,7 +28,6 @@
     <div class="source">Källa: MSB & Halmstads kommun.</div>
   </section>
 
-  <!-- Det här gör du direkt -->
   <section class="section warn">
     <h3>Det här gör du direkt</h3>
     <ul>
@@ -42,7 +39,6 @@
     <div class="source">Källa: MSB:s generella krisråd.</div>
   </section>
 
-  <!-- Det här gör kommunen -->
   <section class="section">
     <h3>Det här gör kommunen</h3>
     <ul>
@@ -53,15 +49,28 @@
     </ul>
   </section>
 
-  <!-- Förberedelser (endast Före krisen) -->
   <section class="section">
     <h3>Förberedelser</h3>
-    <div id="fore" class="tab-panel">
+
+    <div class="tabs">
+      <button class="tab active" data-tab="fore">Före krisen</button>
+      <button class="tab" data-tab="efter">Efter krisen</button>
+    </div>
+
+    <div id="fore" class="tab-panel" style="display:none">
       <ul class="checklist">
         <li><input type="checkbox"/> Ha hemberedskap för minst en vecka.</li>
         <li><input type="checkbox"/> Vatten, mat, värmekällor, ficklampa och powerbank.</li>
         <li><input type="checkbox"/> Viktiga telefonnummer: 112, 113 13, 1177, 114 14.</li>
         <li><input type="checkbox"/> Familjeplan: var träffas ni, vem hämtar barn.</li>
+      </ul>
+    </div>
+
+    <div id="efter" class="tab-panel" style="display:none">
+      <ul class="checklist">
+        <li><input type="checkbox"/> Vänta på klartecken från myndigheter.</li>
+        <li><input type="checkbox"/> Komplettera förbrukade förråd.</li>
+        <li><input type="checkbox"/> Reflektera över vad som fungerade och kan förbättras.</li>
       </ul>
     </div>
 
